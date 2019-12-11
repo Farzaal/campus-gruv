@@ -21,7 +21,7 @@ Route.get('/', () => {
 
 Route.group(() => {
   Route.post('/user/signup', 'UserController.signUp').validator('SignUp')
-  Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
+  Route.post('/user/signin', 'UserController.signIn')
 }).prefix('api/v1')
 
 
