@@ -3,14 +3,18 @@ const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
+const Database = use('Database')
+
 
 class PostController {
 
-    async fetchall({request, response}){
+    async fetchAllPosts({request, response}){
 
-    const posts = PostMaster.all()
+    const posts = await PostMaster.query().with('users').fetch()
+    const postsJson = posts.toJSON()
+ 
 
-    return posts
+    return response.status(200).json(postsJson)
 
 
     }

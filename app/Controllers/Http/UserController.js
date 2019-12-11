@@ -19,11 +19,14 @@ class UserController {
           const prof = request.file('profile_pic')
           let cloudinaryMeta = await Cloudinary.uploader.upload(prof.tmpPath)
           user.profile_pic_url = cloudinaryMeta.secure_url
+          
         } catch(exp) {
+          console.log(exp)
           message = 'Sign up success but unable to save profile pic';
           Logger.info({ url: request.url(), Exception: exp.message})
         }
       }
+
       user.first_name = body.first_name
       user.last_name = body.last_name
       user.email = body.email
