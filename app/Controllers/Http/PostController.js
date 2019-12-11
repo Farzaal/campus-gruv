@@ -6,6 +6,17 @@ const Logger = use('Logger')
 
 class PostController {
 
+    async fetchall({request, response}){
+
+    const posts = PostMaster.all()
+
+    return posts
+
+
+    }
+
+
+
     async createPost({ request, response }) {
         try {
             const postData = request.only(['user_id','category_id','title','description'])
