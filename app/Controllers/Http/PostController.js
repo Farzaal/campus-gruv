@@ -10,7 +10,8 @@ class PostController {
 
     async fetchAllPosts({request, response}){
 
-    const posts = await PostMaster.query().with('users').fetch()
+    const posts = await PostMaster.query().with('users').with('postDetail').fetch()
+
     const postsJson = posts.toJSON()
  
 
