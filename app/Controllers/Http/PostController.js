@@ -9,18 +9,10 @@ const Database = use('Database')
 class PostController {
 
     async fetchAllPosts({request, response}){
-
-    const posts = await PostMaster.query().with('users').with('postDetail').fetch()
-
-    const postsJson = posts.toJSON()
- 
-
-    return response.status(200).json(postsJson)
-
-
+        const posts = await PostMaster.query().with('users').with('postDetail').fetch()
+        const postsJson = posts.toJSON()
+        return response.status(200).json(postsJson)
     }
-
-
 
     async createPost({ request, response }) {
         try {
@@ -55,8 +47,8 @@ class PostController {
                     await postDetail.save()
                     postDetails.push(postDetail)
                 } catch(exp) {
-                    console.log(exp)
                     Logger.info({ url: request.url(), Exception: exp.message})
+                    return response.status(400).json({message: exp.message})      
                 }
             }
             return response.status(201).json(postDetails)
