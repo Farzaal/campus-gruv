@@ -6,7 +6,7 @@ class PostDetail {
         return {
           user_id: 'required',
           post_id: 'required',
-          post_detail_images: 'file_ext:png,jpg|file_size:4mb|file_types:image'
+          post_detail_images: 'required|file_ext:png,jpg|file_size:4mb|file_types:image'
         }
     }
     
