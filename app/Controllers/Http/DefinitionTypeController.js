@@ -4,7 +4,7 @@ const R = require('ramda')
 
 class DefinitionTypeController {
 
-    async definitionType({ request, response }) {
+    async definitionType({ request, auth, response }) {
 
         const { def_type_id } = request.get() 
         if(!def_type_id) {

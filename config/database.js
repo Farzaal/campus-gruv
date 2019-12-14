@@ -57,7 +57,9 @@ module.exports = {
       password: Env.get('DB_PASSASWORD_LOCAL', 'p7DrXsV5kh'),
       database: Env.get('DB_DATABAASSASE_LOCAL', 'L6p2G1KnSJ')
     },
-    debug: Env.get('DB_DEBUG', false)
+    debug: Env.get('DB_DEBUG', false),
+    pool: { min: 1, max: 100 },
+    acquireConnectionTimeout: 10000
   },
 
   /*

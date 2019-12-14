@@ -5,7 +5,7 @@ const LikeDetail = use('App/Models/LikeDetail')
 
 class LikeController {
 
-    async likePost({ request, response }) {
+    async likePost({ request, auth, response }) {
 
         let likeCount = 1
         let likeMasterData = request.only(['post_id'])
@@ -30,7 +30,7 @@ class LikeController {
         }
     }
 
-    async unlikePost({ request, response }) {
+    async unlikePost({ request, auth, response }) {
         
         const body = request.post()
             const likeDel = await LikeDetail.query().where('like_id', body.like_id).where('user_id', body.user_id).delete()

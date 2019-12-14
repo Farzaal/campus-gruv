@@ -8,13 +8,13 @@ const Database = use('Database')
 
 class PostController {
 
-    async fetchAllPosts({request, response}){
+    async fetchAllPosts({request, auth, response}){
         const posts = await PostMaster.query().with('users').with('postDetail').fetch()
         const postsJson = posts.toJSON()
         return response.status(200).json(postsJson)
     }
 
-    async createPost({ request, response }) {
+    async createPost({ request, auth, response }) {
         try {
             const postData = request.only(['user_id','category_id','title','description'])
             const post = await PostMaster.create(postData)
@@ -25,7 +25,7 @@ class PostController {
         }
     }
     
-    async postDetail({ request, response }) {
+    async postDetail({ request, auth, response }) {
         const body = request.post()
         const postDetailImages = request.file('post_detail_images')
         const postMaster = PostMaster.find(body.post_id)
