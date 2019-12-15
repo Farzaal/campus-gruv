@@ -14,4 +14,3 @@ database/*.sqlite
 
 config/cloudinary.js
 
-config/sendGrid.js
