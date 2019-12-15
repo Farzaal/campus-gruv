@@ -41,7 +41,7 @@ class UserController {
       const sendGrid = Config.get('sendGrid.sgMail')
       const msg = {
         to: email,
-        from: 'farzal.digitalwaze@gmail.com',
+        from: 'campus.gruv.2020@gmail.com',
         subject: 'Campus Gruv signup successful',
         text: 'Welcome to campus gruv. You have registered successfully',
       };
