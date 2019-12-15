@@ -53,7 +53,7 @@ class UserController {
     }
   }
 
-  async signIn({request, response}) {
+  async signIn({request, auth, response}) {
     const body = request.post()
     const token = await auth.attempt(body.email, body.password)
     if(token) {
