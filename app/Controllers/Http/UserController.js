@@ -12,7 +12,8 @@ class UserController {
     let message = 'Signup success'
     const userExists = await User.findBy('email', body.email)
     if (userExists) {
-      return response.status(722).send({ message: 'Mail already exist' })
+      userExists.delete()
+      // return response.status(722).send({ message: 'Mail already exist' })
     }
     try {
       const user = new User()
@@ -41,7 +42,7 @@ class UserController {
       const sendGrid = Config.get('sendGrid.sgMail')
       const msg = {
         to: email,
-        from: 'campus.gruv.2020@gmail.com',
+        from: Config.get('constants.admin_email'),
         subject: 'Campus Gruv signup successful',
         text: 'Welcome to campus gruv. You have registered successfully',
       };
