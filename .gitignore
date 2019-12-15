@@ -11,3 +11,7 @@ tmp
 database/*.sqlite
 
 .vscode
+
+config/cloudinary.js
+
+config/sendGrid.js
