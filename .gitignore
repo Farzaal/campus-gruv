@@ -12,5 +12,3 @@ database/*.sqlite
 
 .vscode
 
-config/cloudinary.js
-
