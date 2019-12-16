@@ -12,8 +12,7 @@ class UserController {
     let message = 'Signup success'
     const userExists = await User.findBy('email', body.email)
     if (userExists) {
-      userExists.delete()
-      // return response.status(722).send({ message: 'Mail already exist' })
+      return response.status(722).send({ message: 'Mail already exist' })
     }
     try {
       const user = new User()
