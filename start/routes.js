@@ -24,12 +24,11 @@ Route.group(() => {
   Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
 }).prefix('api/v1')
 
-
 Route.group(() => {
   Route.get('app/lov', 'DefinitionTypeController.definitionType')
   Route.post('post/detail', 'PostController.postDetail').validator('PostDetail')
   Route.post('post/create', 'PostController.createPost').validator('CreatePost')
   Route.get('post/all', 'PostController.fetchAllPosts')
-  // Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
-  // Route.post('post/unlike', 'LikeController.unlikePost').validator('UnlikePost')
+  Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
+  Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
 }).prefix('api/v1').middleware('auth:jwt')

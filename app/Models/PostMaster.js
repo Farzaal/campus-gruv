@@ -23,9 +23,6 @@ class PostMaster extends Model {
   postDetail() {
     return this.hasMany('App/Models/PostDetail', 'id', 'post_id')
   }
-  likeMaster() {
-    return this.hasOne('App/Models/LikeMaster', 'id', 'post_id')
-  }
 }
 
 module.exports = PostMaster
