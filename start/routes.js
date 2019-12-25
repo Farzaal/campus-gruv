@@ -24,6 +24,7 @@ Route.group(() => {
   Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
 }).prefix('api/v1')
 
+// POST ROUTES
 Route.group(() => {
   Route.get('app/lov', 'DefinitionTypeController.definitionType')
   Route.post('post/detail', 'PostController.postDetail').validator('PostDetail')
@@ -31,4 +32,11 @@ Route.group(() => {
   Route.get('post/all', 'PostController.fetchAllPosts')
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
+}).prefix('api/v1').middleware('auth:jwt')
+
+// COMMENT ROUTES
+Route.group(() => {
+  Route.post('comment/create', 'CommentController.createComment').validator('Comment')
+  Route.patch('comment/edit', 'CommentController.editComment')
+  Route.delete('comment/delete', 'CommentController.deleteComment')
 }).prefix('api/v1').middleware('auth:jwt')
