@@ -9,7 +9,7 @@ class User extends Model {
   }
 
   static get hidden () {
-    return ['password', 'token', 'is_active', 'email_verified', 'uuid']
+    return ['password', 'token', 'is_active', 'email_verified', 'uuid', 'otp']
   }
   static async getUserbyEmail(email, token) {
     const userByEmail = await this.findBy('email', email)

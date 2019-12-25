@@ -22,6 +22,9 @@ Route.get('/', () => {
 Route.group(() => {
   Route.post('/user/signup', 'UserController.signUp').validator('SignUp')
   Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
+  Route.get('/user/send_otp', 'UserController.sendUserOtp')
+  Route.get('/user/verify_otp', 'UserController.verifyUserOtp')
+  Route.get('/user/reset_password', 'UserController.resetPassword')
 }).prefix('api/v1')
 
 // POST ROUTES
