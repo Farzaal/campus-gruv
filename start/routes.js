@@ -51,4 +51,5 @@ Route.group(() => {
 
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
+  Route.get('save/post', 'UserController.savedPosts')
 }).prefix('api/v1').middleware('auth:jwt')

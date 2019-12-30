@@ -5,6 +5,7 @@ const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Config = use('Config')
 const Hash = use('Hash')
+const UserSavedPost = use('App/Models/UserSavedPost')
 
 class UserController {
 
@@ -126,7 +127,22 @@ class UserController {
     contact_no ? user.contact_no = contact_no : '' 
     graduate_year ? user.graduate_year = new Date(graduate_year) : '' 
     await user.save()
-    return response.status(200).json({ message: 'Profile updates successfully' })
+    return response.status(200).json({ message: 'Profile updated successfully' })
+  }
+
+  async savedPosts({ request, auth, response }) {
+    console.log("asd")
+    const body = request.get()
+    if(!body.post_id) {
+      return response.status(722).json({ message: 'post_id is required' })
+    }
+    const authUser = await auth.getUser()
+    const authUserJson = authUser.toJSON()
+    const userSavedPost = new UserSavedPost()
+    userSavedPost.post_id = body.post_id
+    userSavedPost.user_id = authUserJson.id
+    await userSavedPost.save()
+    return response.status(200).json({ message: 'User post saved Successfully' })
   }
 }
 
