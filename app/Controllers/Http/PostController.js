@@ -17,6 +17,9 @@ class PostController {
     async createPost({ request, auth, response }) {
         try {
             const postData = request.only(['user_id','category_id','title','description'])
+            const authUser = await auth.getUser()
+            const { campus_id } = authUser.toJSON()
+            postData.campus_id = campus_id 
             const post = await PostMaster.create(postData)
             const userPost = post.toJSON()
             return response.status(200).json(userPost)
