@@ -43,3 +43,12 @@ Route.group(() => {
   Route.patch('comment/edit', 'CommentController.editComment')
   Route.delete('comment/delete', 'CommentController.deleteComment')
 }).prefix('api/v1').middleware('auth:jwt')
+
+Route.group(() => {
+  Route.get('fetch/campuses', 'SettingController.fetchCampuses')
+  Route.get('post/categories', 'SettingController.fetchPostCategories')
+}).prefix('api/v1').middleware('auth:jwt')
+
+Route.group(() => {
+  Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
+}).prefix('api/v1').middleware('auth:jwt')

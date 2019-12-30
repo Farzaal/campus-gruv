@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Config = use('Config')
+const Hash = use('Hash')
 
 class UserController {
 
@@ -20,8 +21,7 @@ class UserController {
       const user = new User()
       if (request.file('profile_pic')) {
         const prof = request.file('profile_pic')
-        let cloudinaryMeta = await Cloudinary.uploader.upload(prof.tmpPath)
-        user.profile_pic_url = cloudinaryMeta.secure_url
+        user.profile_pic_url = this.uploadToCloudnainary(prof) 
       }
       user.first_name = body.first_name
       user.last_name = body.last_name
@@ -36,6 +36,11 @@ class UserController {
       Logger.info({ url: request.url(), Exception: exp.message })
       return response.status(400).send({ message: exp.message })
     }
+  }
+
+  async uploadToCloudnainary(prof) {
+    let cloudinaryMeta = await Cloudinary.uploader.upload(prof.tmpPath)
+    return cloudinaryMeta.secure_url
   }
 
   async sendEmail(email, subject, text) {
@@ -94,11 +99,34 @@ class UserController {
   
   async resetPassword({ request, response }) {
     const { otp, password } = request.get()
-    const resetPass = await User.query().where('otp', otp).update({ password: password, otp: '' })
+    const securePassword = Hash.make(password)
+    const resetPass = await User.query().where('otp', otp).update({ password: securePassword, otp: '' })
     if(resetPass) {
       return response.status(200).json({ message: 'Password reset successfully' })
     }
     return response.status(400).json({ message: 'Unable to reset password' })
+  }
+
+  async editUserProfile({ request, auth, response }) {
+    const campus_id = request.input('campus_id', '')
+    const dob = request.input('dob', '')
+    const major = request.input('major', '')
+    const contact_no = request.input('contact_no', '')
+    const graduate_year = request.input('graduate_year', '')
+    const authUser = await auth.getUser()
+    const { id } = authUser.toJSON()
+    const user = await User.find(id)
+    if(request.file('profile_pic')) {
+      const prof = request.file('profile_pic')
+      user.profile_pic_url = await this.uploadToCloudnainary(prof) 
+    }
+    user.campus_id = campus_id 
+    dob ? user.dob = new Date(dob) : ''
+    major ? user.major = major: ''
+    contact_no ? user.contact_no = contact_no : '' 
+    graduate_year ? user.graduate_year = new Date(graduate_year) : '' 
+    await user.save()
+    return response.status(200).json({ message: 'Profile updates successfully' })
   }
 }
 

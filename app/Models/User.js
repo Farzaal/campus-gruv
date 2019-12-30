@@ -17,7 +17,7 @@ class User extends Model {
     return userWithToken;
   }
   campus(){
-    return this.belongsTo('App/Models/DefinitionTypeDetail', 'campus_id', 'id');
+    return this.belongsTo('App/Models/Campus', 'campus_id', 'id');
   }
   postMaster() {
     return this.hasMany('App/Models/PostMaster')

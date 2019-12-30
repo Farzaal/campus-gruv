@@ -17,8 +17,8 @@ class PostMaster extends Model {
   users() {
     return this.belongsTo('App/Models/User');
   }
-  category(){
-    return this.belongsTo('App/Models/DefinitionTypeDetail', 'category_id', 'id');
+  postCategory(){
+    return this.belongsTo('App/Models/PostCategory', 'category_id', 'id');
   }
   postDetail() {
     return this.hasMany('App/Models/PostDetail', 'id', 'post_id')
