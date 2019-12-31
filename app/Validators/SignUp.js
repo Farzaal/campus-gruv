@@ -8,7 +8,6 @@ class SignUp {
       last_name: 'required',
       email: 'required|email',
       password: 'required',
-      campus_id: 'required',
       profile_pics: 'file_ext:png,jpg|file_size:4mb|file_types:image'
     }
   }

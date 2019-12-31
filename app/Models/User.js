@@ -7,7 +7,6 @@ class User extends Model {
     super.boot()
     this.addHook('beforeCreate', 'UserHook.hashPassword')
   }
-
   static get hidden () {
     return ['password', 'token', 'is_active', 'email_verified', 'uuid', 'otp']
   }
