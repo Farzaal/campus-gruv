@@ -17,11 +17,17 @@ class PostMaster extends Model {
   users() {
     return this.belongsTo('App/Models/User');
   }
+  campuses() {
+    return this.belongsTo('App/Models/Campus');
+  }
   postCategory(){
     return this.belongsTo('App/Models/PostCategory', 'category_id', 'id');
   }
   postDetail() {
     return this.hasMany('App/Models/PostDetail', 'id', 'post_id')
+  }
+  comments() {
+    return this.hasMany('App/Models/UserWiseComment', 'id', 'post_id')
   }
 }
 

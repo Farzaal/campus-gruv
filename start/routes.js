@@ -49,7 +49,15 @@ Route.group(() => {
   Route.get('post/categories', 'SettingController.fetchPostCategories')
 }).prefix('api/v1').middleware('auth:jwt')
 
+// PROFILE ROUTES
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
   Route.get('save/post', 'UserController.savedPosts')
+}).prefix('api/v1').middleware('auth:jwt')
+
+// SEARCH ROUTES
+Route.group(() => {
+  Route.get('search/post', 'SearchController.searchPost').validator('Search')
+  Route.get('search/user', 'SearchController.searchUsers').validator('Search')
+  Route.get('search/campus', 'SearchController.searchCampus')
 }).prefix('api/v1').middleware('auth:jwt')

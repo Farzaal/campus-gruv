@@ -22,6 +22,9 @@ class User extends Model {
   postMaster() {
     return this.hasMany('App/Models/PostMaster')
   }
+  comment() {
+    return this.hasMany('App/Models/User')
+  }
 }
 
 module.exports = User

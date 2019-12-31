@@ -131,7 +131,6 @@ class UserController {
   }
 
   async savedPosts({ request, auth, response }) {
-    console.log("asd")
     const body = request.get()
     if(!body.post_id) {
       return response.status(722).json({ message: 'post_id is required' })
