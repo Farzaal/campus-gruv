@@ -51,7 +51,7 @@ class SearchController {
     async searchUsers({ request, auth, response }) {
         const body = request.get()
         const { type, page } = body
-        const { campus_id } = this.getFromAuthUser(auth)
+        const { campus_id } = await this.getFromAuthUser(auth)
         if(R.equals(type, 'post') && body.user_id) {
             const posts = await PostMaster.query().where('user_id', body.user_id)
             .with('postDetail')
