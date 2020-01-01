@@ -111,6 +111,8 @@ class UserController {
     const campus_id = request.input('campus_id', '')
     const dob = request.input('dob', '')
     const major = request.input('major', '')
+    const first_name = request.input('first_name', '')
+    const last_name = request.input('last_name', '')
     const contact_no = request.input('contact_no', '')
     const graduate_year = request.input('graduate_year', '')
     const authUser = await auth.getUser()
@@ -123,6 +125,8 @@ class UserController {
     user.campus_id = campus_id 
     dob ? user.dob = new Date(dob) : ''
     major ? user.major = major: ''
+    first_name ? user.first_name = first_name: ''
+    last_name ? user.last_name = last_name: ''
     contact_no ? user.contact_no = contact_no : '' 
     graduate_year ? user.graduate_year = new Date(graduate_year) : '' 
     await user.save()
