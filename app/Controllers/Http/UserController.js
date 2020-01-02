@@ -136,7 +136,9 @@ class UserController {
   async getAuthUser({ request, auth, response }) {
     const authUser = await auth.getUser()
     const authUserJson = authUser.toJSON()
-    return response.status(200).json(authUserJson)
+    const user = User.find(authUserJson.id)
+    const userJson = user.toJSON()
+    return response.status(200).json(userJson)
   }
 
   async savedPosts({ request, auth, response }) {
