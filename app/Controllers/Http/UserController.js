@@ -133,6 +133,12 @@ class UserController {
     return response.status(200).json({ message: 'Profile updated successfully' })
   }
 
+  async getAuthUser({ request, auth, response }) {
+    const authUser = await auth.getUser()
+    const authUserJson = authUser.toJSON()
+    return response.status(200).json(authUserJson)
+  }
+
   async savedPosts({ request, auth, response }) {
     const body = request.get()
     if(!body.post_id) {

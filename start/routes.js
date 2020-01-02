@@ -19,6 +19,7 @@ Route.get('/', () => {
   return { greeting: 'Hello world in JSON' }
 })
 
+// USER ROUTES WITHOUT AUTH
 Route.group(() => {
   Route.post('/user/signup', 'UserController.signUp').validator('SignUp')
   Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
@@ -53,6 +54,7 @@ Route.group(() => {
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
   Route.get('save/post', 'UserController.savedPosts')
+  Route.get('get/user', 'UserController.getAuthUser')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // SEARCH ROUTES
