@@ -153,11 +153,16 @@ class UserController {
     return response.status(200).json({ message: 'Profile updated successfully' })
   }
 
-  async getAuthUser({ request, auth, response }) {
-    const authUser = await auth.getUser()
-    const authUserJson = authUser.toJSON()
-    const user = await User.find(authUserJson.id)
-    const userJson = user.toJSON()
+  async getAuthUser({ request, response }) {
+    const body = request.get()
+    if(!body.user_id) {
+      return response.status(722).json({ message: 'user_id is required' })
+    }
+    const user = await User.find(body.user_id)
+    if(!user) {
+      return response.status(200).json({ message: 'User does not exist' })
+    }
+    const userJson = user.toJSON() 
     return response.status(200).json(userJson)
   }
 
