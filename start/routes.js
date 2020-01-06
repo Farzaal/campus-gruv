@@ -33,7 +33,8 @@ Route.group(() => {
   Route.get('app/lov', 'DefinitionTypeController.definitionType')
   Route.post('post/detail', 'PostController.postDetail').validator('PostDetail')
   Route.post('post/create', 'PostController.createPost').validator('CreatePost')
-  Route.get('post/all', 'PostController.fetchAllPosts')
+  Route.post('user/save/post', 'PostController.userSavePost')
+  Route.get('fetch/saved/posts', 'PostController.fecthUserSavedPosts')
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
 }).prefix('api/v1').middleware('auth:jwt')
@@ -53,7 +54,6 @@ Route.group(() => {
 // PROFILE ROUTES
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
-  Route.get('save/post', 'UserController.savedPosts')
   Route.get('get/user', 'UserController.getAuthUser')
 }).prefix('api/v1').middleware('auth:jwt')
 

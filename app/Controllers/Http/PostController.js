@@ -1,18 +1,14 @@
 'use strict'
 const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
+const UserSavedPost = use('App/Models/UserSavedPost')
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Database = use('Database')
+const R = use('ramda')
 
 
 class PostController {
-
-    async fetchAllPosts({request, auth, response}){
-        const posts = await PostMaster.query().with('users').with('postDetail').fetch()
-        const postsJson = posts.toJSON()
-        return response.status(200).json(postsJson)
-    }
 
     async createPost({ request, auth, response }) {
         try {
@@ -57,6 +53,44 @@ class PostController {
             return response.status(201).json(postDetails)
         }  
         return response.status(400).json({message})      
+    }
+
+    async fecthUserSavedPosts({ request, auth, response }) {
+        try { 
+            const page = request.input('page', 1)
+            const authUser = await auth.getUser()
+            const authUserJson = authUser.toJSON()
+            const savePostIds = await UserSavedPost.query().where('user_id', authUserJson.id).select('post_id').fetch()
+            const postIds = R.pluck('post_id')(savePostIds.toJSON())
+            const posts = await PostMaster.query().whereIn('id', postIds)
+            .with('postDetail')
+            .with('comments')
+            .with('users')
+            .with('postCategory')
+            .with('campuses')
+            .orderBy('created_at', 'DESC').paginate(page)
+            const postsJson = posts.toJSON()
+            return response.status(200).json(postsJson)
+        } catch (e) {
+            Logger.info({ url: request.url(), Exception: e.message})
+            return response.status(200).json({ message: 'Something went wrong. Unable to get saved posts' })
+        }
+    }
+
+    async userSavePost({ request, auth, response }) {
+        try {
+            const { post_id } = request.post()
+            const authUser = await auth.getUser()
+            const authUserJson = authUser.toJSON()
+            const userSavePost = new UserSavedPost()
+            userSavePost.post_id = post_id
+            userSavePost.user_id = authUserJson.id
+            await userSavePost.save()
+            return response.status(200).json({ message: 'Post Saved Successfully' })
+        } catch(e) {
+            Logger.info({ url: request.url(), exception: e.message })
+            return response.status(400).json({ message: 'Post already saved' })
+        }
     }
 }
 
