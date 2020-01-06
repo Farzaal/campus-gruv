@@ -79,11 +79,14 @@ class PostController {
 
     async userSavePost({ request, auth, response }) {
         try {
-            const { post_id } = request.post()
+            const body = request.get()
+            if(!body.post_id) {
+                return response.status(722).json({ message: 'Post_id is required' })
+            }
             const authUser = await auth.getUser()
             const authUserJson = authUser.toJSON()
             const userSavePost = new UserSavedPost()
-            userSavePost.post_id = post_id
+            userSavePost.post_id = body.post_id
             userSavePost.user_id = authUserJson.id
             await userSavePost.save()
             return response.status(200).json({ message: 'Post Saved Successfully' })
