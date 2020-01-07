@@ -19,7 +19,7 @@ class LikeController {
         } catch(e) {
             Logger.info({ url: request.url(), Exception: e.message})
             await trx.rollback() 
-            return response.status(400).json({ message: e.message })
+            return response.status(400).json({ message: 'Unable to like post' })
         }
     }
     
