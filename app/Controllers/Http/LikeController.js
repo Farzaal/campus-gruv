@@ -12,7 +12,8 @@ class LikeController {
         const trx = await Database.beginTransaction()
         try {
             await trx.table('post_master').where('id', body.post_id).increment('likes_count', 1)
-            await trx.insert({ post_id: body.post_id, user_id: body.user_id }).into('user_wise_likes')
+            await trx.insert({ post_id: body.post_id, user_id: body.user_id,
+            created_at: new Date(), updated_at: new Date() }).into('user_wise_likes')
             await trx.commit()
             return response.status(201).json({ message: 'Post liked successfully' })
         } catch(e) {
