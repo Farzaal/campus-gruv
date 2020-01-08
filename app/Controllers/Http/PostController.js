@@ -64,7 +64,7 @@ class PostController {
             const postIds = R.pluck('post_id')(savePostIds.toJSON())
             const posts = await PostMaster.query().whereIn('id', postIds)
             .with('postDetail')
-            .with('comments')
+            .with('comments.user')
             .with('users')
             .with('postCategory')
             .with('campuses')

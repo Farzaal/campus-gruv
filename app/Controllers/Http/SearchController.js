@@ -26,7 +26,7 @@ class SearchController {
         if(R.equals(type, 'post_category') && body.category_id) {
             const posts = await PostMaster.query().where('campus_id', campus_id).where('category_id', body.category_id)
             .with('postDetail')
-            .with('comments')
+            .with('comments.user')
             .with('users')
             .with('postCategory')
             .with('campuses')
@@ -37,7 +37,7 @@ class SearchController {
         if(R.equals(type, 'post_search') && body.description) {
             const posts = await PostMaster.query().where('campus_id', campus_id).where('title', 'LIKE', `%${body.description}%`)
             .with('postDetail')
-            .with('comments')
+            .with('comments.user')
             .with('users')
             .with('postCategory')
             .with('campuses')
@@ -55,7 +55,7 @@ class SearchController {
         if(R.equals(type, 'post') && body.user_id) {
             const posts = await PostMaster.query().where('user_id', body.user_id)
             .with('postDetail')
-            .with('comments')
+            .with('comments.user')
             .with('users')
             .with('postCategory')
             .with('campuses')
