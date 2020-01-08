@@ -11,8 +11,9 @@ class User extends Model {
     return ['password', 'token', 'is_active', 'uuid']
   }
   static async getUserbyEmail(email, token) {
-    const userByEmail = await this.findBy('email', email)
-    const userWithToken = { ...userByEmail.toJSON(), ...token }    
+    const userByEmail = await this.query().where('email', email).with('campus').fetch()
+    const userByEmailJson = userByEmail.toJSON()    
+    const userWithToken = { ...userByEmailJson[0], ...token }    
     return userWithToken;
   }
   campus(){
