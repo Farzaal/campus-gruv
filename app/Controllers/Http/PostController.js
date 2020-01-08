@@ -95,6 +95,15 @@ class PostController {
             return response.status(400).json({ message: 'Post already saved' })
         }
     }
+
+    async postViewCount({ request, response }) {
+        const body = request.get()
+        if(!body.post_id) {
+            return response.status(722).json({ message: 'post_id is required' })
+        }
+        await Database.table('post_master').where('id', body.post_id).increment('view_count', 1)        
+        return response.status(200).json({ message: 'View count updated' })
+    }
 }
 
 module.exports = PostController
