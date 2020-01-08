@@ -150,7 +150,9 @@ class UserController {
     contact_no ? user.contact_no = contact_no : ''
     graduate_year ? user.graduate_year = new Date(graduate_year) : ''
     await user.save()
-    return response.status(200).json({ message: 'Profile updated successfully' })
+    const savedUser = await User.find(id)
+    const savedUserJson = savedUser.toJSON()
+    return response.status(200).json(savedUserJson)
   }
 
   async getAuthUser({ request, response }) {
