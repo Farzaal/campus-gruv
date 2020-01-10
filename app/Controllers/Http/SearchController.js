@@ -20,6 +20,7 @@ class SearchController {
                 .with('campuses')
                 .orderBy('created_at', 'DESC').paginate(page)
             const postsJson = posts.toJSON()
+            //console.log(postsJson,'postsJson');
             return response.status(200).json(postsJson) 
         }
 

@@ -2,6 +2,8 @@
 const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
 const UserSavedPost = use('App/Models/UserSavedPost')
+const UserWisePostFlag = use('App/Models/UserWisePostFlag')
+const PostFlagCount = use('App/Models/PostFlagCount')
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Database = use('Database')
@@ -95,6 +97,86 @@ class PostController {
             return response.status(400).json({ message: 'Post already saved' })
         }
     }
+
+    async flagPost({request , auth , response}){
+        const body = request.post();
+        const trx = await Database.beginTransaction()
+        const postExists = await UserWisePostFlag.findBy('post_id', body.post_id)
+        //
+        
+        if(!postExists){
+        try{
+            await trx.insert({post_id:body.post_id,user_id:body.user_id,created_at:new Date(),
+            updated_at:new Date()}).into('user_wise_post_flag')
+            await trx.insert({post_id:body.post_id,user_id:body.user_id}).into('post_flag_count')
+            await trx.commit()
+            return response.status(201).json({message:'You have reported this post'})
+        }
+        catch{
+            Logger.info({url:request.url(),Exception:e.message})
+            await trx.rollback()
+            return response.status(400).json({message:'Unable to report this post'})
+        }
+    }
+
+    else{
+  
+        const PostNT = await PostFlagCount.findBy('post_id', body.post_id)
+        const PUCheck = PostNT.toJSON()
+        console.log(PUCheck.user_id,Number(body.user_id))
+        if(PUCheck.user_id == body.user_id){
+            try{
+                return response.status(201).json({message:'added in new table'})
+            }
+            catch{
+                Logger.info({url:request.url(),Exception:e.message})
+                await trx.rollback()
+                return response.status(400).json({message:'Unable to added in new table'})
+            }
+            console.log('user exist')
+        }
+
+        ///comment 1//
+else{
+
+        //// comment 2/////
+        const flagNo = postExists.toJSON()
+        console.log(flagNo.flag_count)
+         if(flagNo.flag_count >= 2 ){
+            try {
+                await trx.table('post_master').where('id', body.post_id).update({ active: 0 })
+                await trx.table('user_wise_post_flag').where('post_id', body.post_id).increment('flag_count', 1)
+                await trx.insert({post_id:body.post_id,user_id:body.user_id}).into('post_flag_count')
+                await trx.commit()
+                return response.status(201).json({ message: 'Post Flag successfully to 3' })
+            } catch(e) {
+                Logger.info({ url: request.url(), Exception: e.message})
+                await trx.rollback() 
+                return response.status(400).json({ message: 'Unable to Flag post' })
+            }
+        }
+
+
+        else{
+        try {
+            await trx.table('user_wise_post_flag').where('post_id', body.post_id).increment('flag_count', 1)
+            await trx.insert({post_id:body.post_id,user_id:body.user_id}).into('post_flag_count')
+            await trx.commit()
+            return response.status(201).json({ message: 'Post Flag successfully then' })
+        } catch(e) {
+            Logger.info({ url: request.url(), Exception: e.message})
+            await trx.rollback() 
+            return response.status(400).json({ message: 'Unable to Flag post' })
+        }
+    }
+//////comment 2//////
+}
+// comment 1//////
+
+}
+
+
+        }
 }
 
 module.exports = PostController

@@ -37,6 +37,7 @@ Route.group(() => {
   Route.get('fetch/saved/posts', 'PostController.fecthUserSavedPosts')
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
+  Route.post('post/flag', 'PostController.flagPost').validator('PostFlag')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // COMMENT ROUTES
