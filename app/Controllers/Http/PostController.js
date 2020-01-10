@@ -66,7 +66,7 @@ class PostController {
             const postIds = R.pluck('post_id')(savePostIds.toJSON())
             const posts = await PostMaster.query().whereIn('id', postIds)
             .with('postDetail')
-            .with('comments')
+            .with('comments.user')
             .with('users')
             .with('postCategory')
             .with('campuses')
@@ -177,6 +177,14 @@ else{
 
 
         }
+    async postViewCount({ request, response }) {
+        const body = request.get()
+        if(!body.post_id) {
+            return response.status(722).json({ message: 'post_id is required' })
+        }
+        await Database.table('post_master').where('id', body.post_id).increment('view_count', 1)        
+        return response.status(200).json({ message: 'View count updated' })
+    }
 }
 
 module.exports = PostController
