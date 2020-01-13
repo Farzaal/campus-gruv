@@ -9,7 +9,7 @@ class PostMaster extends Model {
     return 'post_master'
   }
   static get hidden () {
-    return ['active']
+    return ['active', 'user_id', 'category_id', 'campus_id', 'created_at', 'updated_at']
   }
   static scopeActive (query) {
     return query.where({active: 1})
@@ -28,6 +28,12 @@ class PostMaster extends Model {
   }
   comments() {
     return this.hasMany('App/Models/UserWiseComment', 'id', 'post_id')
+  }
+  userSavedPost() {
+    return this.hasMany('App/Models/UserSavedPost', 'id', 'post_id')
+  }
+  userWiseLike() {
+    return this.hasMany('App/Models/UserWiseLike', 'id', 'post_id')
   }
 }
 
