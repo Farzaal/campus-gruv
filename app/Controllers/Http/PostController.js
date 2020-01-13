@@ -98,6 +98,31 @@ class PostController {
         }
     }
 
+    async userUnsavedPost({request,auth,response}){
+        try{
+            const body = request.get()
+            console.log(body,'body')
+            if(!body.post_id) {
+                return response.status(722).json({ message: 'Post_id is required' })
+            }
+            if(!body.user_id) {
+                return response.status(722).json({ message: 'user_id is required' })
+            }
+            const check = await Database.from('user_saved_posts').where({ user_id: body.user_id,post_id:body.post_id })
+            console.log(check.length)
+           if(check.length != 0 ){
+                await Database.from('user_saved_posts').where({ user_id: body.user_id,post_id:body.post_id }).delete()
+                return response.status(200).json({ message: 'Post Unsaved Successfully' })
+            }
+            else{
+                return response.status(722).json({ message: 'Post already Unsaved' })
+            }
+        }catch(e){
+            Logger.info({ url: request.url(), exception: e.message })
+            return response.status(400).json({ message: 'Post already Unsaved' })
+        }
+    }
+
     async flagPost({request , auth , response}){
         const body = request.post();
         const trx = await Database.beginTransaction()

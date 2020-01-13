@@ -36,6 +36,7 @@ Route.group(() => {
   Route.get('user/save/post', 'PostController.userSavePost')
   Route.get('fetch/saved/posts', 'PostController.fecthUserSavedPosts')
   Route.get('view/count', 'PostController.postViewCount')
+  Route.get('user/unsave/post', 'PostController.userUnsavedPost')
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
   Route.post('post/flag', 'PostController.flagPost').validator('PostFlag')
