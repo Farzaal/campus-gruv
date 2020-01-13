@@ -107,7 +107,7 @@ class PostController {
         if(!postExists){
         try{
             await trx.insert({post_id:body.post_id,user_id:body.user_id,created_at:new Date(),
-            updated_at:new Date()}).into('user_wise_post_flag')
+            updated_at:new Date(),flag_count:1}).into('user_wise_post_flag')
             await trx.insert({post_id:body.post_id,user_id:body.user_id}).into('post_flag_count')
             await trx.commit()
             return response.status(201).json({message:'You have reported this post'})
@@ -121,12 +121,27 @@ class PostController {
 
     else{
   
-        const PostNT = await PostFlagCount.findBy('post_id', body.post_id)
-        const PUCheck = PostNT.toJSON()
-        console.log(PUCheck.user_id,Number(body.user_id))
-        if(PUCheck.user_id == body.user_id){
+        // const PostNT = await PostFlagCount.findBy('post_id', body.post_id)
+
+        // const PUCheck = PostNT.toJSON()
+        // console.log(PUCheck.user_id,Number(body.user_id))
+        // if(PUCheck.user_id == body.user_id){
+        //     try{
+        //         return response.status(201).json({message:'You can not report again '})
+        //     }
+        //     catch{
+        //         Logger.info({url:request.url(),Exception:e.message})
+        //         await trx.rollback()
+        //         return response.status(400).json({message:'Unable to added in new table'})
+        //     }
+        //     console.log('user exist')
+        // }
+        const check = await Database.from('post_flag_count').where({ user_id: body.user_id,post_id:body.post_id })
+        // const PUCheck = check.toJSON()
+        console.log(check.length,'PUCheck')
+        if(check.length != 0){
             try{
-                return response.status(201).json({message:'added in new table'})
+                return response.status(201).json({message:'You can not report again '})
             }
             catch{
                 Logger.info({url:request.url(),Exception:e.message})
@@ -135,7 +150,6 @@ class PostController {
             }
             console.log('user exist')
         }
-
         ///comment 1//
 else{
 
