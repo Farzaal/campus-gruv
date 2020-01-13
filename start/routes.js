@@ -58,7 +58,9 @@ Route.group(() => {
 // PROFILE ROUTES
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
-  Route.get('get/user', 'UserController.getAuthUser')
+  Route.get('get/user', 'UserController.getUserById')
+  Route.get('user/follow', 'UserController.followUser')
+  Route.get('user/unfollow', 'UserController.unFollowUser')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // SEARCH ROUTES
