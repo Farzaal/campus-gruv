@@ -40,6 +40,7 @@ Route.group(() => {
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
   Route.post('post/flag', 'PostController.flagPost').validator('PostFlag')
+  Route.get('user/share/post', 'PostController.userSharePost')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // COMMENT ROUTES

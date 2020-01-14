@@ -2,6 +2,7 @@
 const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
 const UserSavedPost = use('App/Models/UserSavedPost')
+const UserSharePost = use('App/Models/SharedPost')
 const UserWisePostFlag = use('App/Models/UserWisePostFlag')
 const PostFlagCount = use('App/Models/PostFlagCount')
 const Cloudinary = use('Cloudinary')
@@ -80,11 +81,13 @@ class PostController {
     }
 
     async userSavePost({ request, auth, response }) {
+
         try {
             const body = request.get()
             if(!body.post_id) {
                 return response.status(722).json({ message: 'Post_id is required' })
             }
+            
             const authUser = await auth.getUser()
             const authUserJson = authUser.toJSON()
             const userSavePost = new UserSavedPost()
@@ -216,6 +219,36 @@ else{
 
 
         }
+
+
+
+        async userSharePost({ request, auth, response }) {
+            try {
+                const body = request.get()
+                if(!body.post_id) {
+                    return response.status(722).json({ message: 'Post_id is required' })
+                }
+                console.log(body)
+                const authUser = await auth.getUser()
+                const authUserJson = authUser.toJSON()
+                const userSavePost = new UserSharePost()
+                userSavePost.post_id = body.post_id
+                // userSavePost.user_id = body.user_id
+                userSavePost.user_id = authUserJson.id
+
+                console.log(body.post_id)
+                console.log(authUserJson.id)
+
+                await userSavePost.save()
+                return response.status(200).json({ message: 'Post Shared Successfully' })
+            } catch(e) {
+                Logger.info({ url: request.url(), exception: e.message })
+                return response.status(400).json({ message: e.message})
+            }
+        }
+        
+
+
     async postViewCount({ request, response }) {
         const body = request.get()
         if(!body.post_id) {
