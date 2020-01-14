@@ -34,6 +34,7 @@ Route.group(() => {
   Route.post('post/detail', 'PostController.postDetail').validator('PostDetail')
   Route.post('post/create', 'PostController.createPost').validator('CreatePost')
   Route.get('user/save/post', 'PostController.userSavePost')
+  Route.get('user/unsave/post', 'PostController.unsaveUserPost')
   Route.get('fetch/saved/posts', 'PostController.fecthUserSavedPosts')
   Route.get('view/count', 'PostController.postViewCount')
   Route.get('user/unsave/post', 'PostController.userUnsavedPost')
@@ -58,7 +59,9 @@ Route.group(() => {
 // PROFILE ROUTES
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
-  Route.get('get/user', 'UserController.getAuthUser')
+  Route.get('get/user', 'UserController.getUserById')
+  Route.get('user/follow', 'UserController.followUser')
+  Route.get('user/unfollow', 'UserController.unFollowUser')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // SEARCH ROUTES

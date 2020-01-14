@@ -7,6 +7,7 @@ const Config = use('Config')
 const Hash = use('Hash')
 const R = use('ramda')
 const UserSavedPost = use('App/Models/UserSavedPost')
+const UserFollower = use('App/Models/UserFollower')
 const UserOtp = use('App/Models/UserOtp')
 
 class UserController {
@@ -53,7 +54,7 @@ class UserController {
   async sendUserOtp({ request, response }) {
     const { email, type } = request.get()
     const message = 'An otp has been sent via an email'
-    if(!R.equals(type, 'reset_password')) {
+    if (!R.equals(type, 'reset_password')) {
       return response.status(722).json({ message: 'Invalid type' })
     }
     const userOtp = await UserOtp.query().where('email', email).where('type', type).fetch()
@@ -62,7 +63,7 @@ class UserController {
     }
     await UserOtp.query().where('email', email).where('type', type).update({ active: 1 })
     const userOtpJson = userOtp.toJSON()
-    this.sendEmail(email,'Reset Password','reset_password',userOtpJson[0].otp)
+    this.sendEmail(email, 'Reset Password', 'reset_password', userOtpJson[0].otp)
     return response.status(200).json({ message })
   }
 
@@ -155,16 +156,16 @@ class UserController {
     return response.status(200).json(savedUserJson)
   }
 
-  async getAuthUser({ request, response }) {
+  async getUserById({ request, response }) {
     const body = request.get()
-    if(!body.user_id) {
+    if (!body.user_id) {
       return response.status(722).json({ message: 'user_id is required' })
     }
     const user = await User.find(body.user_id)
-    if(!user) {
+    if (!user) {
       return response.status(200).json({ message: 'User does not exist' })
     }
-    const userJson = user.toJSON() 
+    const userJson = user.toJSON()
     return response.status(200).json(userJson)
   }
 
@@ -180,6 +181,35 @@ class UserController {
     userSavedPost.user_id = authUserJson.id
     await userSavedPost.save()
     return response.status(200).json({ message: 'User post saved Successfully' })
+  }
+
+  async followUser({ request, auth, response }) {
+    const body = request.get()
+    if (!body.user_id) {
+      return response.status(722).json({ message: 'user_id is required' })
+    }
+    try {
+      const authUser = await auth.getUser()
+      const authUserJson = authUser.toJSON()
+      const userFollower = new UserFollower()
+      userFollower.user_id = authUserJson.id
+      userFollower.follower_id = body.user_id
+      await userFollower.save()
+      return response.status(200).json({ message: 'User Follower created' })
+    } catch(e) {
+      return response.status(400).json({ message: 'Something went wrong' })
+    }
+  }
+
+  async unFollowUser({ request, auth, response }) {
+    const body = request.get()
+    if (!body.user_id) {
+      return response.status(722).json({ message: 'user_id is required' })
+    }
+    const authUser = await auth.getUser()
+    const authUserJson = authUser.toJSON()
+    await UserFollower.query().where('user_id', authUserJson.id).where('follower_id', body.user_id).delete()
+    return response.status(200).json({ message: 'User Follower destroyed' })
   }
 }
 
