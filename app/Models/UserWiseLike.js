@@ -6,7 +6,7 @@ class UserWiseLike extends Model {
   static get table () {
     return 'user_wise_likes'
   }
-  users() {
+  user() {
     return this.belongsTo('App/Models/User', 'user_id', 'id');
   }
   posts(){
