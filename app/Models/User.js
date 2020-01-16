@@ -28,6 +28,9 @@ class User extends Model {
   userSavedPost() {
     return this.hasMany('App/Models/UserSavedPost', 'id', 'user_id')
   }
+  userFollower() {
+    return this.hasMany('App/Models/UserFollower', 'id', 'follower_id')
+  }
 }
 
 module.exports = User
