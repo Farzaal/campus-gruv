@@ -3,8 +3,7 @@ const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
 const UserSavedPost = use('App/Models/UserSavedPost')
 const UserSharePost = use('App/Models/SharedPost')
-const UserWisePostFlag = use('App/Models/UserWisePostFlag')
-const PostFlagCount = use('App/Models/PostFlagCount')
+const PostReport = use ('App/Models/PostReport')
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Database = use('Database')
@@ -27,6 +26,7 @@ class PostController {
     }
 
     async postDetail({ request, auth, response }) {
+        console.log('chal rha ')
         const body = request.post()
         const postDetailImages = request.file('post_detail_images')
         const postMaster = PostMaster.find(body.post_id)
@@ -34,12 +34,17 @@ class PostController {
         let postDetails = []
         if (postDetailImages) {
             let filesCount = 1;
+          
             if (postDetailImages['_files']) {
                 filesCount = postDetailImages['_files'].length;
+             
+
             }
             for (let i = 0; i < filesCount; i++) {
                 try {
+                    console.log('form')
                     let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages['_files'][i].tmpPath)
+                    console.log(cloudinaryMeta,'======================cloudinary')
                     const postDetail = new PostDetail()
                     postDetail.post_id = body.post_id
                     postDetail.user_id = body.user_id
@@ -68,7 +73,6 @@ class PostController {
                 .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
                 .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
-                .with('users.userFollower')
                 .with('userSavedPost.post', (builder) => builder.select('id'))
                 .with('userWiseLike.user', (builder) => builder.select('id'))
                 .with('postCategory')
@@ -140,7 +144,65 @@ class PostController {
         }
     }
 
+    async reportPost({ request,response,auth}){
 
+        try {
+            const body = request.post()
+            const user_id = auth.user.id
+            const post_id = body.post_id
+            const reportLimit = 3
+            //check if current report exist from same user 
+            const existingreport = await Database.from('post_reports').where({user_id , post_id})
+            const reportexist = existingreport.length === 0 ? false : true 
+           
+            if(!reportexist)
+            {
+               //check num of counts on that posts
+            const reportsOnThatPost = await Database.from('post_reports').where({ post_id})
+        
+            if(reportsOnThatPost.length < reportLimit){
+                
+             const Report = new PostReport()
+                Report.user_id = user_id
+                Report.post_id = post_id
+                 await Report.save()
+                 if(reportsOnThatPost.length === reportLimit - 1)
+                 {
+                     console.log('inactive hogya')
+                    await PostMaster.query().where('id',post_id).update({active:0})
+   
+                 }
+               return response.status(200).json({ message: 'Post Reported Successfully' })
+                
+
+            }
+             return response.status(400).json({ message: 'post limit reached maximum,under review' })
+          
+            
+                
+            }
+            else{
+                return response.status(400).json({ message: 'Post already reported' })
+            }
+           
+          
+
+
+
+            //make report if none of above
+
+            
+    
+        }catch(e)
+        {
+            Logger.info({ url: request.url(), exception: e.message })
+            return response.status(400).json({ message: e.message })
+        }
+       
+       
+
+
+    }
 
     async postViewCount({ request, response }) {
         const body = request.get()

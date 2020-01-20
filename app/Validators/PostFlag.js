@@ -3,8 +3,7 @@
 class PostFlag {
   get rules () {
     return {
-      post_id: 'required',
-      user_id: 'required',
+      post_id: 'required'
     }
   }
 
