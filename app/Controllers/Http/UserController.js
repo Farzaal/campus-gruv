@@ -161,7 +161,7 @@ class UserController {
     if (!body.user_id) {
       return response.status(722).json({ message: 'user_id is required' })
     }
-    const user = await User.find(body.user_id)
+    const user = await User.query().where('id', body.user_id).with('campus').first()
     if (!user) {
       return response.status(200).json({ message: 'User does not exist' })
     }
