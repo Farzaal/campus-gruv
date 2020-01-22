@@ -5,6 +5,7 @@ class LikeValidation {
     return {
       post_id: 'required',
       user_id: 'required',
+      post_created_by: 'required' 
     }
   }
 

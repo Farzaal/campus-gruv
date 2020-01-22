@@ -1,13 +1,24 @@
 'use strict'
 const Logger = use('Logger')
 const UserWiseComment = use('App/Models/UserWiseComment')
+const UserWiseNotification = use('App/Models/UserWiseNotification')
 
 class CommentController {
 
   async createComment({ request, auth, response }) {
+    const body = request.post()
+    const user = await auth.getUser()
+    const userJson = user.toJSON()
+    const commentMsg = `${userJson.first_name} ${userJson.last_name} has commented on your post` 
     try {
       const comment = request.only(['description', 'user_id', 'post_id'])
+      const user_notification = {
+        post_id: body.post_id, 
+        user_id: body.post_created_by, 
+        notification_message: commentMsg,
+      };
       const saveComment = await UserWiseComment.create(comment)
+      const saveNotification = await UserWiseNotification.create(user_notification)
       const saveCommentJson = saveComment.toJSON()
       return response.status(200).json(saveCommentJson)
     } catch (exp) {

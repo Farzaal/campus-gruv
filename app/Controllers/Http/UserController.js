@@ -211,6 +211,16 @@ class UserController {
     await UserFollower.query().where('user_id', authUserJson.id).where('follower_id', body.user_id).delete()
     return response.status(200).json({ message: 'User Follower destroyed' })
   }
+
+  async userNotifications({ request, response }) {
+    const body = request.get()
+    if(!body.user_id && !body.page) {
+      return response.status(722).send({ message: 'user_id, page is required' })
+    }
+    const userNot = await UserWiseNotification.query().where('user_id', body.user_id).orderBy('created_at', 'DESC').paginate(body.page)
+    const userNotJson = userNot.toJSON()
+    return response.status(200).send(userNotJson)
+  }
 }
 
 module.exports = UserController

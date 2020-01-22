@@ -6,7 +6,8 @@ class Comment {
     return {
       post_id: 'required',
       user_id: 'required',
-      description: 'required'
+      description: 'required',
+      post_created_by: 'required'
     }
   }
 
