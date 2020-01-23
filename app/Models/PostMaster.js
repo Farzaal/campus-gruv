@@ -9,7 +9,7 @@ class PostMaster extends Model {
     return 'post_master'
   }
   static get hidden () {
-    return ['active', 'user_id', 'category_id', 'campus_id', 'created_at', 'updated_at']
+    return ['active', 'category_id', 'campus_id', 'created_at', 'updated_at']
   }
   static scopeActive (query) {
     return query.where({active: 1})
