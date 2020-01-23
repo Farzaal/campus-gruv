@@ -78,7 +78,7 @@ class PostController {
             return response.status(200).json(postsJson)
         } catch (e) {
             Logger.info({ url: request.url(), Exception: e.message })
-            return response.status(200).json({ message: 'Something went wrong. Unable to get saved posts' })
+            return response.status(400).json({ message: 'Something went wrong. Unable to get saved posts' })
         }
     }
 

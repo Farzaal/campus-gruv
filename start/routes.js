@@ -71,4 +71,5 @@ Route.group(() => {
   Route.get('search/post', 'SearchController.searchPost').validator('Search')
   Route.get('search/user', 'SearchController.searchUsers').validator('Search')
   Route.get('search/campus', 'SearchController.searchCampus')
+  Route.get('follower/posts', 'SearchController.followerPost')
 }).prefix('api/v1').middleware('auth:jwt')
