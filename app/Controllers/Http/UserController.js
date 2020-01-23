@@ -196,7 +196,7 @@ class UserController {
       userFollower.follower_id = body.user_id
       await userFollower.save()
       return response.status(200).json({ message: 'User Follower created' })
-    } catch(e) {
+    } catch (e) {
       return response.status(400).json({ message: 'Something went wrong' })
     }
   }
@@ -214,12 +214,28 @@ class UserController {
 
   async userNotifications({ request, response }) {
     const body = request.get()
-    if(!body.user_id && !body.page) {
+    if (!body.user_id && !body.page) {
       return response.status(722).send({ message: 'user_id, page is required' })
     }
     const userNot = await UserWiseNotification.query().where('user_id', body.user_id).orderBy('created_at', 'DESC').paginate(body.page)
     const userNotJson = userNot.toJSON()
     return response.status(200).send(userNotJson)
+  }
+
+  async followDetails({ request, auth, response }) {
+    try {
+      let followerDetails = {};
+      const user = await auth.getUser()
+      const userJson = user.toJSON()
+      const user_id = userJson.id 
+      const followerCount = await UserFollower.query().where('user_id', user_id).getCount()
+      const followingCount = await UserFollower.query().where('follower_id', user_id).getCount()
+      followerDetails = { user_id, followerCount, followingCount }
+      return response.status(200).json([followerDetails])
+    } catch (e) {
+      Logger.info({ url: request.url(), Exception: e.message })
+      return response.status(200).json({ message: 'Something Went Wrong' })
+    }
   }
 }
 
