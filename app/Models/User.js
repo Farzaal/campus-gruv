@@ -10,7 +10,7 @@ class User extends Model {
   static get hidden () {
     return ['password', 'token', 'is_active', 'uuid']
   }
-  static async getUserbyEmail(email, token) {
+  static async getUserbyEmail(email, token) {                             
     const userByEmail = await this.query().where('email', email).with('campus').fetch()
     const userByEmailJson = userByEmail.toJSON()    
     const userWithToken = { ...userByEmailJson[0], ...token }    
@@ -30,6 +30,9 @@ class User extends Model {
   }
   userFollower() {
     return this.hasMany('App/Models/UserFollower', 'id', 'follower_id')
+  }
+  userFollowing() {
+    return this.hasMany('App/Models/UserFollower', 'id', 'user_id')
   }
 }
 

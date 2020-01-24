@@ -55,7 +55,7 @@ class PostController {
         // const compresPath = Helpers.tmpPath(`${postDetailImages.clientName}`)
         // let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages.tmpPath)
         // const source = await tinify.fromFile(postDetailImages)
-        // await source.toFile(compresPath)
+        // await source.toFile(secPath)
         // let cloudinaryCompressed = await Cloudinary.uploader.upload(compresPath)
         // imageUrls.originalImageUrl = cloudinaryMeta.secure_url
         // imageUrls.compresImageUrl = cloudinaryCompressed.secure_url
@@ -74,7 +74,7 @@ class PostController {
                 .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
                 .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
-                .with('users.userFollower')
+                .with('users.userFollowing')
                 .with('userSavedPost.post', (builder) => builder.select('id'))
                 .with('userWiseLike.user', (builder) => builder.select('id'))
                 .with('postCategory')
