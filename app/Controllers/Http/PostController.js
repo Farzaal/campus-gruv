@@ -9,6 +9,11 @@ const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Database = use('Database')
 const R = use('ramda')
+const fs = use('fs')
+const Env = use('Env')
+const Helpers = use('Helpers')
+const tinify = require("tinify");
+tinify.key = Env.get("TINY_PNG_API_KEY");
 
 class PostController {
 
@@ -29,8 +34,8 @@ class PostController {
     async postDetail({ request, auth, response }) {
         const body = request.post()
         const postDetailImages = request.file('post_detail_images')
-        try {
         let message = 'Unable to save post detail'
+        try {
             let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages.tmpPath)
             const postDetail = new PostDetail()
             postDetail.post_id = body.post_id
@@ -43,6 +48,19 @@ class PostController {
             Logger.info({ url: request.url(), Exception: exp.message })
             return response.status(400).json({ message: exp.message })
         }
+    }
+
+    async handleCloudinaryUpload(postDetailImages) {
+        let imageUrls = {}
+        // const compresPath = Helpers.tmpPath(`${postDetailImages.clientName}`)
+        // let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages.tmpPath)
+        // const source = await tinify.fromFile(postDetailImages)
+        // await source.toFile(compresPath)
+        // let cloudinaryCompressed = await Cloudinary.uploader.upload(compresPath)
+        // imageUrls.originalImageUrl = cloudinaryMeta.secure_url
+        // imageUrls.compresImageUrl = cloudinaryCompressed.secure_url
+        // fs.unlinkSync(compresPath)
+        return imageUrls
     }
 
     async fecthUserSavedPosts({ request, auth, response }) {
