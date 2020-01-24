@@ -8,6 +8,7 @@ const Hash = use('Hash')
 const R = use('ramda')
 const UserSavedPost = use('App/Models/UserSavedPost')
 const UserFollower = use('App/Models/UserFollower')
+const UserWiseNotification = use('App/Models/UserWiseNotification')
 const UserOtp = use('App/Models/UserOtp')
 
 class UserController {
