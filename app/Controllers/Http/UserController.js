@@ -224,10 +224,12 @@ class UserController {
 
   async followDetails({ request, auth, response }) {
     try {
+      const body = request.get()
+      if(!body.user_id) {
+        return response.status(200).json({ message: 'User_id is required' })
+      }
       let followerDetails = {};
-      const user = await auth.getUser()
-      const userJson = user.toJSON()
-      const user_id = userJson.id 
+      const user_id = body.user_id 
       const followerCount = await UserFollower.query().where('user_id', user_id).getCount()
       const followingCount = await UserFollower.query().where('follower_id', user_id).getCount()
       followerDetails = { user_id, followerCount, followingCount }
