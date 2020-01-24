@@ -29,32 +29,20 @@ class PostController {
     async postDetail({ request, auth, response }) {
         const body = request.post()
         const postDetailImages = request.file('post_detail_images')
-        const postMaster = PostMaster.find(body.post_id)
+        try {
         let message = 'Unable to save post detail'
-        let postDetails = []
-        if (postDetailImages) {
-            let filesCount = 1;
-            if (postDetailImages['_files']) {
-                filesCount = postDetailImages['_files'].length;
-            }
-            for (let i = 0; i < filesCount; i++) {
-                try {
-                    let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages['_files'][i].tmpPath)
-                    const postDetail = new PostDetail()
-                    postDetail.post_id = body.post_id
-                    postDetail.user_id = body.user_id
-                    postDetail.image_url = cloudinaryMeta.secure_url
-                    request.post_detail_title ? body.post_detail_title = request.post_detail_title : postDetail.post_detail_title = 'No Title'
-                    await postDetail.save()
-                    postDetails.push(postDetail)
-                } catch (exp) {
-                    Logger.info({ url: request.url(), Exception: exp.message })
-                    return response.status(400).json({ message: exp.message })
-                }
-            }
-            return response.status(201).json(postDetails)
+            let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages.tmpPath)
+            const postDetail = new PostDetail()
+            postDetail.post_id = body.post_id
+            postDetail.user_id = body.user_id
+            postDetail.image_url = cloudinaryMeta.secure_url
+            request.post_detail_title ? body.post_detail_title = request.post_detail_title : postDetail.post_detail_title = 'No Title'
+            await postDetail.save()
+            return response.status(200).json(postDetail)
+        } catch (exp) {
+            Logger.info({ url: request.url(), Exception: exp.message })
+            return response.status(400).json({ message: exp.message })
         }
-        return response.status(400).json({ message })
     }
 
     async fecthUserSavedPosts({ request, auth, response }) {
