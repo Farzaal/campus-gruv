@@ -3,8 +3,7 @@ const PostMaster = use('App/Models/PostMaster')
 const PostDetail = use('App/Models/PostDetail')
 const UserSavedPost = use('App/Models/UserSavedPost')
 const UserSharePost = use('App/Models/SharedPost')
-const UserWisePostFlag = use('App/Models/UserWisePostFlag')
-const PostFlagCount = use('App/Models/PostFlagCount')
+const PostReport = use('App/Models/PostReport')
 const Cloudinary = use('Cloudinary')
 const Logger = use('Logger')
 const Database = use('Database')
@@ -146,7 +145,21 @@ class PostController {
         }
     }
 
-
+    async reportPost({ request, auth, response }) {
+        const body = request.post()
+        const reportCount = await PostReport.query().where('post_id', body.post_id).getCount()
+        if(R.equals(reportCount, 3)) {
+            return response.status(400).json({ message: 'Post is already inactive' })
+        }
+        if(R.equals(reportCount, 2)) {
+            await PostMaster.query().where('id', body.post_id).update({ active: 0 })
+        }
+        const postReport = new PostReport()
+        postReport.post_id = body.post_id
+        postReport.user_id = body.user_id
+        await postReport.save()
+        return response.status(200).json({ message: 'Post reported successfully' })
+    }
 
     async postViewCount({ request, response }) {
         const body = request.get()
