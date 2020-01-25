@@ -74,7 +74,7 @@ class PostController {
                 .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
                 .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
-                .with('users.userFollowing')
+                .with('users.userFollower')
                 .with('userSavedPost.post', (builder) => builder.select('id'))
                 .with('userWiseLike.user', (builder) => builder.select('id'))
                 .with('postCategory')
