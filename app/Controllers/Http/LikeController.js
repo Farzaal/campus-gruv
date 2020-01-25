@@ -18,7 +18,7 @@ class LikeController {
             await trx.insert({ post_id: body.post_id, user_id: body.user_id,
             created_at: new Date(), updated_at: new Date() }).into('user_wise_likes')
             
-            await trx.insert({ post_id: body.post_id, user_id: body.post_created_by, notification_message: likeMsg,
+            await trx.insert({ post_id: body.post_id, user_id: body.post_created_by, notification_by: body.user_id ,notification_message: likeMsg,
             created_at: new Date(), updated_at: new Date() }).into('user_wise_notifications')
             
             await trx.commit()

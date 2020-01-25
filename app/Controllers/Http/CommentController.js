@@ -14,7 +14,8 @@ class CommentController {
       const comment = request.only(['description', 'user_id', 'post_id'])
       const user_notification = {
         post_id: body.post_id, 
-        user_id: body.post_created_by, 
+        user_id: body.post_created_by,
+        notification_by: userJson.id, 
         notification_message: commentMsg,
       };
       const saveComment = await UserWiseComment.create(comment)

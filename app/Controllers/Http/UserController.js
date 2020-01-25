@@ -218,7 +218,7 @@ class UserController {
     if (!body.user_id && !body.page) {
       return response.status(722).send({ message: 'user_id, page is required' })
     }
-    const userNot = await UserWiseNotification.query().where('user_id', body.user_id).with('user').orderBy('created_at', 'DESC').paginate(body.page)
+    const userNot = await UserWiseNotification.query().where('user_id', body.user_id).with('userNotification').orderBy('created_at', 'DESC').paginate(body.page)
     const userNotJson = userNot.toJSON()
     return response.status(200).send(userNotJson)
   }
