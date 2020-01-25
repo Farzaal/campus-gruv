@@ -94,7 +94,7 @@ class SearchController {
         if(R.equals(type, 'user') && body.description) {
             const users = await User.query().where('campus_id', campus_id).where('first_name', 'LIKE', `%${body.description}%`)
             .with('campus')
-            .with('userFollower')
+            .with('userFollowing')
             .orderBy('created_at', 'DESC').paginate(page)
             const usersJson = users.toJSON()
             return response.status(200).json(usersJson) 
