@@ -15,7 +15,7 @@ class SearchController {
 
         if(R.equals(type, 'post_all')) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id)
-                .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+                .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
                 .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users.userFollower')
@@ -30,7 +30,7 @@ class SearchController {
 
         if(R.equals(type, 'post_category') && body.category_id) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id).where('category_id', body.category_id)
-            .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+            .with('postDetail', (builder) => builder.select('post_id','post_detail_title', 'image_url'))
             .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users.userFollower')
@@ -44,7 +44,7 @@ class SearchController {
         }
         if(R.equals(type, 'post_search') && body.description) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id).where('title', 'LIKE', `%${body.description}%`)
-            .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+            .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
             .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users.userFollower')
@@ -65,7 +65,7 @@ class SearchController {
         const { campus_id } = await this.getFromAuthUser(auth)
         if(R.equals(type, 'post') && body.user_id && !body.description) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id).where('user_id', body.user_id)
-            .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+            .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
             .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users.userFollower')
@@ -79,7 +79,7 @@ class SearchController {
         }
         if(R.equals(type, 'post') && body.description && body.user_id) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id).where('user_id', body.user_id).where('title', 'LIKE', `%${body.description}%`)
-            .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+            .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
             .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
             .with('users.userFollower')
@@ -120,7 +120,7 @@ class SearchController {
             const followers = await UserFollower.query().where('user_id', authUserJson.id).select('follower_id').fetch()
             const followerIds = R.pluck('follower_id')(followers.toJSON())
             const followerPosts = await PostMaster.query().active().whereIn('user_id', followerIds)
-                .with('postDetail', (builder) => builder.select('post_detail_title', 'image_url'))
+                .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
                 .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
                 .with('users.userFollowing')
