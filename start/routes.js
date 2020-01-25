@@ -24,6 +24,8 @@ Route.group(() => {
   Route.post('/user/signup', 'UserController.signUp').validator('SignUp')
   Route.post('/user/signin', 'UserController.signIn').validator('SignIn')
   Route.get('/user/send_otp', 'UserController.sendUserOtp').validator('SendUserOtp')
+  Route.get('/download/pdf', 'DefinitionTypeController.downloadPdf')
+  Route.get('/generate/pdf', 'DefinitionTypeController.generatePdf')
   Route.get('/user/verify_otp', 'UserController.verifyUserOtp').validator('VerifyUserOtp')
   Route.get('/user/reset_password', 'UserController.resetPassword')
 }).prefix('api/v1')
