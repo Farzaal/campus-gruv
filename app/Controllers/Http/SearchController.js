@@ -62,7 +62,7 @@ class SearchController {
     async searchUsers({ request, auth, response }) {
         const body = request.get()
         const { type, page } = body
-        const { campus_id } = await this.getFromAuthUser(auth)
+        const { campus_id, id } = await this.getFromAuthUser(auth)
         if(R.equals(type, 'post') && body.user_id && !body.description) {
             const posts = await PostMaster.query().active().where('campus_id', campus_id).where('user_id', body.user_id)
             .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
@@ -93,8 +93,8 @@ class SearchController {
         }
         if(R.equals(type, 'user') && body.description) {
             const users = await User.query().where('campus_id', campus_id).where('first_name', 'LIKE', `%${body.description}%`)
-            .with('campus')
-            .with('userFollowing')
+            .with('campus') 
+            .with('userFollowing', (builder) => builder.where('follower_id', id)) 
             .orderBy('created_at', 'DESC').paginate(page)
             const usersJson = users.toJSON()
             return response.status(200).json(usersJson) 
