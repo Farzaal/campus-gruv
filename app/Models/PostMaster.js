@@ -35,6 +35,9 @@ class PostMaster extends Model {
   userWiseLike() {
     return this.hasMany('App/Models/UserWiseLike', 'id', 'post_id')
   }
+  userFollowing() {
+    return this.hasMany('App/Models/UserFollower', 'user_id', 'user_id')
+  }
 }
 
 module.exports = PostMaster
