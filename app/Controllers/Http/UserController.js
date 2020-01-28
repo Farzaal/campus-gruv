@@ -192,12 +192,15 @@ class UserController {
     try {
       const authUser = await auth.getUser()
       const authUserJson = authUser.toJSON()
+      const notificationMsg = `${authUserJson.first_name} ${authUserJson.last_name} has followed you`
       const userFollower = new UserFollower()
-      userFollower.user_id = authUserJson.id
-      userFollower.follower_id = body.user_id
+      userFollower.user_id = body.user_id
+      userFollower.follower_id = authUserJson.id
       await userFollower.save()
+      await UserWiseNotification.create({ user_id: body.user_id, notification_by: authUserJson.id, notification_message: notificationMsg })
       return response.status(200).json({ message: 'User Follower created' })
     } catch (e) {
+      console.log(e)
       return response.status(400).json({ message: 'Something went wrong' })
     }
   }
