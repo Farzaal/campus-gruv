@@ -212,7 +212,7 @@ class UserController {
     }
     const authUser = await auth.getUser()
     const authUserJson = authUser.toJSON()
-    await UserFollower.query().where('user_id', authUserJson.id).where('follower_id', body.user_id).delete()
+    await UserFollower.query().where('user_id', body.user_id).where('follower_id', authUserJson.id).delete()
     return response.status(200).json({ message: 'User Follower destroyed' })
   }
 
