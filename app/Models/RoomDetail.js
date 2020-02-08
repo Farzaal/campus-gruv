@@ -18,7 +18,7 @@ class RoomDetail extends Model {
         const query = `SELECT A.room_id FROM room_detail A, room_detail B 
         WHERE A.user_id = ?
         AND B.user_id = ?
-        AND A.room_id = B.room_ids`;
+        AND A.room_id = B.room_id`;
         const room = await Database.raw(query,[authUserId, user_id])
         const roomJSON = JSON.stringify(room[0])
         return roomJSON
