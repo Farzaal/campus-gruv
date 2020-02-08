@@ -9,6 +9,9 @@ class RoomController {
 
     async userRoom({ request, auth, response }) {
         const body = request.get()
+        if(!body.user_id) {
+            return response.status(722).json({ message: 'user_id is required' });
+        }
         const user = await auth.getUser()
         const userJson = user.toJSON();
         const roomJson = await RoomDetail.getUserRoom(userJson.id, body.user_id)

@@ -14,10 +14,11 @@ class ChatController {
   }
   async onMessage(message) {
     const user = await this.auth.getUser()
-    const { id } = user.toJSON()
+    const { id, first_name } = user.toJSON()
     await RoomMessage.create({ room_id: message.room_id, user_id: id, message: message.message })
     const userRoom = await RoomDetail.query().where('room_id', message.room_id).with('user').fetch()  
     const userRoomJson = userRoom.toJSON()
+    message.name = first_name
     this.socket.emitTo('message', message, [userRoomJson[0].user.socket_id, userRoomJson[1].user.socket_id])
   }
   async onFetch({ room_id }) {
