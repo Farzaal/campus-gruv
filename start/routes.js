@@ -75,3 +75,8 @@ Route.group(() => {
   Route.get('search/campus', 'SearchController.searchCampus')
   Route.get('follower/posts', 'SearchController.followerPost')
 }).prefix('api/v1').middleware('auth:jwt')
+
+// ROOM ROUTES
+Route.group(() => {
+  Route.get('room/details', 'RoomController.userRoom')
+}).prefix('api/v1').middleware('auth:jwt')
