@@ -133,7 +133,7 @@ class SearchController {
             return response.status(200).json(followerPostsJson)
         } catch (e) {
             Logger.info({ url: request.url(), Exception: e.message })
-            return response.status(400).json({ message: 'Something went wrong. Unable to get followers posts' })
+            return response.status(400).json({ message: 'Something went wrong. Unable to get your followed user posts' })
         }
     }
 

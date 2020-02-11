@@ -234,8 +234,8 @@ class UserController {
       }
       let followerDetails = {};
       const user_id = body.user_id 
-      const followerCount = await UserFollower.query().where('user_id', user_id).getCount()
-      const followingCount = await UserFollower.query().where('follower_id', user_id).getCount()
+      const followingCount = await UserFollower.query().where('user_id', user_id).getCount()
+      const followerCount = await UserFollower.query().where('follower_id', user_id).getCount()
       followerDetails = { user_id, followerCount, followingCount }
       return response.status(200).json([followerDetails])
     } catch (e) {
