@@ -16,7 +16,7 @@
 const Route = use('Route')
 
 Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
+  return { greeting: 'Hello world in adonis' }
 })
 
 // USER ROUTES WITHOUT AUTH
