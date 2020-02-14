@@ -5,6 +5,7 @@ const User = use('App/Models/User')
 const Campus = use('App/Models/Campus')
 const UserFollower = use('App/Models/UserFollower')
 const Logger = use('Logger')
+const Database = use('Database')
 
 class SearchController {
 
@@ -164,6 +165,26 @@ class SearchController {
         const authUserJson = authUser.toJSON()
         return authUserJson
     }
+
+    async getUserFollowers({ request, response,auth }){
+    const {user_id}  = request.get()
+    const { campus_id, id } = await this.getFromAuthUser(auth)
+    const followers = await UserFollower.query().where('user_id', user_id).select('follower_id').fetch()
+    const followerIds = R.pluck('follower_id')(followers.toJSON())
+
+    const following = await UserFollower.query().where('follower_id', user_id).select('user_id').fetch()
+    const followingIds = R.pluck('user_id')(following.toJSON())
+        
+    const res = await Database
+    .select('id').select('first_name','last_name','profile_pic_url')
+    .from('users')
+    .whereIn('id', followingIds)
+   
+    return res
+
+    }
+
+
 }
 
 module.exports = SearchController

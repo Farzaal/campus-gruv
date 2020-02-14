@@ -68,6 +68,8 @@ Route.group(() => {
   Route.get('follow/details', 'UserController.followDetails')
 }).prefix('api/v1').middleware('auth:jwt')
 
+Route.get('getfollowers','SearchController.getUserFollowers')
+
 // SEARCH ROUTES
 Route.group(() => {
   Route.get('search/post', 'SearchController.searchPost').validator('Search')
