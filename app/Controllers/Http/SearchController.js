@@ -295,12 +295,9 @@ class SearchController {
       return response.status(200).json(followerPostsJson);
     } catch (e) {
       Logger.info({ url: request.url(), Exception: e.message });
-      return response
-        .status(400)
-        .json({
-          message:
-            "Something went wrong. Unable to get your followed user posts"
-        });
+      return response.status(400).json({
+        message: "Something went wrong. Unable to get your followed user posts"
+      });
     }
   }
 
@@ -311,53 +308,69 @@ class SearchController {
   }
 
   async getUserFollowings({ request, response, auth }) {
+
     const { user_id } = request.get();
     const { campus_id, id } = await this.getFromAuthUser(auth);
-    // const followers = await UserFollower.query()
-    //   .where("user_id", user_id)
-    //   .select("follower_id")
-    //   .fetch();
-    // const followerIds = R.pluck("follower_id")(followers.toJSON());
+    const page = request.input('page', 1)
 
-    const following = await UserFollower.query()
-      .where("follower_id", user_id)
-      .select("user_id")
-      .fetch();
-    const followingIds = R.pluck("user_id")(following.toJSON());
+    try {
 
-    const followings = await User.query()
-      .where("campus_id", campus_id)
-      .whereIn("id", followingIds)
-      .with("userFollowing", builder => builder.where("follower_id", id))
-      .orderBy("created_at", "DESC")
-      .paginate(1);
-    const followingusersJson = followings.toJSON();
-    return response.status(200).json(followingusersJson);
+        const following = await UserFollower.query()
+        .where("follower_id", user_id)
+        .select("user_id")
+        .fetch();
+      const followingIds = R.pluck("user_id")(following.toJSON());
+  
+      const followings = await User.query()
+        .where("campus_id", campus_id)
+        .whereIn("id", followingIds)
+        .with("userFollowing", builder => builder.where("follower_id", id))
+        .orderBy("created_at", "DESC")
+        .paginate(page);
+      const followingusersJson = followings.toJSON();
+      return response.status(200).json(followingusersJson);
+
+
+    } catch (e) {
+      Logger.info({ url: request.url(), Exception: e.message });
+      return response.status(400).json({
+        message: "Something went wrong. Unable to get followings"
+      });
+    }
+
+  
+
+
   }
 
   async getUserFollowers({ request, response, auth }) {
-    const { user_id } = request.get();
+    const { user_id  } = request.get();
     const { campus_id, id } = await this.getFromAuthUser(auth);
-    const followers = await UserFollower.query()
-      .where("user_id", user_id)
-      .select("follower_id")
-      .fetch();
+    const page = request.input('page', 1)
+    
+    try {
+      const follower = await UserFollower.query()
+        .where("user_id", user_id)
+        .select("follower_id")
+        .fetch();
 
-    const followerIds = R.pluck("follower_id")(followers.toJSON());
+      const followerIds = R.pluck("follower_id")(follower.toJSON());
 
-    return followerIds
-
-    const followings = await User.query()
-      .where("campus_id", campus_id)
-      .whereIn("id", followerIds)
-      .with("userFollowing", builder => builder.where("user_id", id))
-      .orderBy("created_at", "DESC")
-      .paginate(1);
-    const followingusersJson = followings.toJSON();
-    return response.status(200).json(followingusersJson);
+      const followers = await User.query()
+        .where("campus_id", campus_id)
+        .whereIn("id", followerIds)
+        .with("userFollower", builder => builder.where("follower_id", id))
+        .orderBy("created_at", "DESC")
+        .paginate(page);
+      const followerusersJson = followers.toJSON();
+      return response.status(200).json(followerusersJson);
+    } catch (e) {
+      Logger.info({ url: request.url(), Exception: e.message });
+      return response.status(400).json({
+        message: "Something went wrong. Unable to get followers"
+      });
+    }
   }
-
-
 }
 
 module.exports = SearchController;

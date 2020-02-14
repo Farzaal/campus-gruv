@@ -67,6 +67,7 @@ Route.group(() => {
   Route.get('user/unfollow', 'UserController.unFollowUser')
   Route.get('follow/details', 'UserController.followDetails')
   Route.get('getfollowings','SearchController.getUserFollowings')
+  Route.get('getfollowers','SearchController.getUserFollowers')
 }).prefix('api/v1').middleware('auth:jwt')
 
 Route.get('getfollowings','SearchController.getUserFollowings')
