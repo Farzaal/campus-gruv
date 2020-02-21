@@ -11,7 +11,8 @@ class SearchController {
   async searchPost({ request, auth, response }) {
     const body = request.get();
     const { type, page } = body;
-    const { campus_id, id } = await this.getFromAuthUser(auth);
+    const { id } = await this.getFromAuthUser(auth);
+    const campus_id = body.campus_id ? body.campus_id : auth.user.campus_id
 
     if (R.equals(type, "post_all")) {
       const posts = await PostMaster.query()
