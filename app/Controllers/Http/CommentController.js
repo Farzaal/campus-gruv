@@ -2,6 +2,7 @@
 const Logger = use('Logger')
 const UserWiseComment = use('App/Models/UserWiseComment')
 const UserWiseNotification = use('App/Models/UserWiseNotification')
+const ApiService = use('App/Services/ApiService')
 
 class CommentController {
 
@@ -21,6 +22,7 @@ class CommentController {
       const saveComment = await UserWiseComment.create(comment)
       const saveNotification = await UserWiseNotification.create(user_notification)
       const saveCommentJson = saveComment.toJSON()
+      const sendNotification = await ApiService.sendUserNotification({ user_id: body.post_created_by, notification: commentMsg });
       return response.status(200).json(saveCommentJson)
     } catch (exp) {
       console.log(exp)

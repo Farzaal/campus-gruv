@@ -7,6 +7,7 @@ const Config = use('Config')
 const Hash = use('Hash')
 const R = use('ramda')
 const UserSavedPost = use('App/Models/UserSavedPost')
+const ApiService = use('App/Services/ApiService')
 const UserFollower = use('App/Models/UserFollower')
 const UserWiseNotification = use('App/Models/UserWiseNotification')
 const UserOtp = use('App/Models/UserOtp')
@@ -198,6 +199,7 @@ class UserController {
       userFollower.follower_id = authUserJson.id
       await userFollower.save()
       await UserWiseNotification.create({ user_id: body.user_id, notification_by: authUserJson.id, notification_message: notificationMsg })
+      const sendNotification = await ApiService.sendUserNotification({ user_id: body.user_id, notification: notificationMsg });
       return response.status(200).json({ message: 'User Follower created' })
     } catch (e) {
       console.log(e)
@@ -212,7 +214,9 @@ class UserController {
     }
     const authUser = await auth.getUser()
     const authUserJson = authUser.toJSON()
+    const notificationMsg = `${authUserJson.first_name} ${authUserJson.last_name} has unfollowed you`
     await UserFollower.query().where('user_id', body.user_id).where('follower_id', authUserJson.id).delete()
+    const sendNotification = await ApiService.sendUserNotification({ user_id: body.user_id, notification: notificationMsg });
     return response.status(200).json({ message: 'User Follower destroyed' })
   }
 
