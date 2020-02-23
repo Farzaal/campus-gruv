@@ -23,7 +23,17 @@ class RoomController {
             await RoomDetail.createMany([{ user_id: userJson.id, room_id: id }, { user_id: body.user_id, room_id: id }])
         }
         return response.status(200).json(roomParseJson);
-    }   
+    }
+    
+    async userChatHistory({ request, auth, response }) {
+        const page = request.input('page', 1)
+        const user = await auth.getUser()
+        const userJson = user.toJSON();
+        const usrRooms = await RoomDetail.query().where('user_id', 491).fetch();
+        const roomIds = R.pluck('room_id')(usrRooms.toJSON())
+        const usrHis = await RoomDetail.query().whereNot('user_id', 491).whereIn('room_id', roomIds).with('user').paginate(page)
+        return response.status(200).json(usrHis.toJSON());
+    }
 }
 
 module.exports = RoomController

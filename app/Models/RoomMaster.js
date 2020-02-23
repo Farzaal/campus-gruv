@@ -12,6 +12,9 @@ class RoomMaster extends Model {
     roomDetail() {
         return this.hasMany('App/Models/RoomDetail', 'id', 'room_id')
     }
+    roomMessage() {
+        return this.hasMany('App/Models/RoomMessage', 'id', 'room_id')
+    }
 }
 
 module.exports = RoomMaster

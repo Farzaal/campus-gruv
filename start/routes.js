@@ -84,4 +84,5 @@ Route.group(() => {
 // ROOM ROUTES
 Route.group(() => {
   Route.get('room/details', 'RoomController.userRoom')
+  Route.get('chat/history', 'RoomController.userChatHistory')
 }).prefix('api/v1').middleware('auth:jwt')
