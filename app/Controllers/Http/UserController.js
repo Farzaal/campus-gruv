@@ -153,7 +153,8 @@ class UserController {
     contact_no ? user.contact_no = contact_no : ''
     graduate_year ? user.graduate_year = new Date(graduate_year) : ''
     await user.save()
-    const savedUser = await User.find(id)
+    // const savedUser = await User.find(id)
+    const savedUser = await User.query().where("campus_id", campus_id).with("campus").fetch()
     const savedUserJson = savedUser.toJSON()
     return response.status(200).json(savedUserJson)
   }
