@@ -51,11 +51,11 @@ module.exports = {
   mysql: {
     client: 'mysql',
     connection: {
-      host: Env.get('DB_HOST_LOCALAS', 'campusdev.chnpxnk9cd85.us-east-2.rds.amazonaws.com'),
-      port: Env.get('DB_PORTSA', '3306'),
-      user: Env.get('DB_USER_LASOCAL', 'campusMaster'),
-      password: Env.get('DB_PASSASWORD_LOCAL', 'campusMaster1234'),
-      database: Env.get('DB_DATABAASSASE_LOCAL', 'campusDev')
+      host: Env.get('DB_HOST', 'localhost'),
+      port: Env.get('DB_PORT', '3306'),
+      user: Env.get('DB_USER', 'root'),
+      password: Env.get('DB_PASSWORD', 'root'),
+      database: Env.get('DB_DATABASE', 'campus_gruv_dev')
     },
     debug: Env.get('DB_DEBUG', false),
     pool: { min: 1, max: 100 },
