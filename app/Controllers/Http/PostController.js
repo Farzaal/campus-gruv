@@ -4,25 +4,17 @@ const PostDetail = use("App/Models/PostDetail");
 const UserSavedPost = use("App/Models/UserSavedPost");
 const UserSharePost = use("App/Models/SharedPost");
 const PostReport = use("App/Models/PostReport");
-const Cloudinary = use("Cloudinary");
 const Logger = use("Logger");
 const Database = use("Database");
 const R = use("ramda");
-const fs = use("fs");
 const Env = use("Env");
-const Helpers = use("Helpers");
-const tinify = require("tinify");
-tinify.key = Env.get("TINY_PNG_API_KEY");
+const HelperService = use('App/Services/HelperService')
+const Config = use("Config");
 
 class PostController {
   async createPost({ request, auth, response }) {
     try {
-      const postData = request.only([
-        "user_id",
-        "category_id",
-        "title",
-        "description"
-      ]);
+      const postData = request.only(["user_id","category_id","title","description"]);
       const authUser = await auth.getUser();
       const { campus_id } = authUser.toJSON();
       postData.campus_id = campus_id;
@@ -39,35 +31,18 @@ class PostController {
     const postDetailImages = request.file("post_detail_images");
     let message = "Unable to save post detail";
     try {
-      let cloudinaryMeta = await Cloudinary.uploader.upload(
-        postDetailImages.tmpPath
-      );
+      const { Location } = await HelperService.uploadToS3(postDetailImages, Config.get('aws.postbucketName'))
       const postDetail = new PostDetail();
       postDetail.post_id = body.post_id;
       postDetail.user_id = body.user_id;
-      postDetail.image_url = cloudinaryMeta.secure_url;
-      request.post_detail_title
-        ? (body.post_detail_title = request.post_detail_title)
-        : (postDetail.post_detail_title = "No Title");
+      postDetail.image_url = Location;
+      request.post_detail_title ? (body.post_detail_title = request.post_detail_title) : (postDetail.post_detail_title = "No Title");
       await postDetail.save();
       return response.status(200).json(postDetail);
     } catch (exp) {
       Logger.info({ url: request.url(), Exception: exp.message });
       return response.status(400).json({ message: exp.message });
     }
-  }
-
-  async handleCloudinaryUpload(postDetailImages) {
-    let imageUrls = {};
-    // const compresPath = Helpers.tmpPath(`${postDetailImages.clientName}`)
-    // let cloudinaryMeta = await Cloudinary.uploader.upload(postDetailImages.tmpPath)
-    // const source = await tinify.fromFile(postDetailImages)
-    // await source.toFile(secPath)
-    // let cloudinaryCompressed = await Cloudinary.uploader.upload(compresPath)
-    // imageUrls.originalImageUrl = cloudinaryMeta.secure_url
-    // imageUrls.compresImageUrl = cloudinaryCompressed.secure_url
-    // fs.unlinkSync(compresPath)
-    return imageUrls;
   }
 
   async fecthUserSavedPosts({ request, auth, response }) {
@@ -170,7 +145,6 @@ class PostController {
       if (!body.post_id) {
         return response.status(722).json({ message: "Post_id is required" });
       }
-      console.log(body);
       const authUser = await auth.getUser();
       const authUserJson = authUser.toJSON();
       const userSavePost = new UserSharePost();
@@ -185,22 +159,6 @@ class PostController {
     }
   }
 
-  // async reportPost({ request, auth, response }) {
-  //     const body = request.post()
-  //     const reportCount = await PostReport.query().where('post_id', body.post_id).getCount()
-  //     if(R.equals(reportCount, 3)) {
-  //         return response.status(400).json({ message: 'Post is already inactive' })
-  //     }
-  //     if(R.equals(reportCount, 2)) {
-  //         await PostMaster.query().where('id', body.post_id).update({ active: 0 })
-  //     }
-  //     const postReport = new PostReport()
-  //     postReport.post_id = body.post_id
-  //     postReport.user_id = body.user_id
-  //     await postReport.save()
-  //     return response.status(200).json({ message: 'Post reported successfully' })
-  // }
-
   async reportPost({ request, auth, response }) {
     try {
       const body = request.post();
@@ -209,18 +167,13 @@ class PostController {
 
       const reportLimit = 3;
       //check if current report exist from same user
-      const existingreport = await Database.from("post_reports").where({
-        user_id,
-        post_id
-      });
+      const existingreport = await Database.from("post_reports").where({user_id, post_id});
       const reportexist = existingreport.length === 0 ? false : true;
-
       if (!reportexist) {
         //check num of counts on that posts
         const reportsOnThatPost = await Database.from("post_reports").where({
           post_id
         });
-
         if (reportsOnThatPost.length < reportLimit) {
           const Report = new PostReport();
           Report.user_id = user_id;
@@ -229,23 +182,14 @@ class PostController {
           Report.description = body.description
           await Report.save();
           if (reportsOnThatPost.length === reportLimit - 1) {
-            console.log("inactive hogya");
-            await PostMaster.query()
-              .where("id", post_id)
-              .update({ active: 0 });
+            await PostMaster.query().where("id", post_id).update({ active: 0 });
           }
-          return response
-            .status(200)
-            .json({ message: "Post Reported Successfully" });
+          return response.status(200).json({ message: "Post Reported Successfully" });
         }
-        return response
-          .status(400)
-          .json({ message: "post limit reached maximum,under review" });
+        return response.status(400).json({ message: "post limit reached maximum,under review" });
       } else {
         return response.status(400).json({ message: "Post already reported" });
       }
-
-      //make report if none of above
     } catch (e) {
       Logger.info({ url: request.url(), exception: e.message });
       return response.status(400).json({ message: e.message });
