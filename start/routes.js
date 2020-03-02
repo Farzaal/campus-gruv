@@ -43,7 +43,6 @@ Route.group(() => {
   Route.post('post/like', 'LikeController.likePost').validator('LikeValidation')
   Route.post('post/unlike', 'LikeController.unlikePost').validator('LikeValidation')
   Route.post('post/report', 'PostController.reportPost').validator('PostFlag')
-  Route.get('user/share/post', 'PostController.userSharePost')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // COMMENT ROUTES
@@ -66,12 +65,9 @@ Route.group(() => {
   Route.get('user/follow', 'UserController.followUser')
   Route.get('user/unfollow', 'UserController.unFollowUser')
   Route.get('follow/details', 'UserController.followDetails')
-  Route.get('getfollowings','SearchController.getUserFollowings')
-  Route.get('getfollowers','SearchController.getUserFollowers')
+  Route.get('follower/users','SearchController.getUserFollowings')
+  Route.get('following/users','SearchController.getUserFollowers')
 }).prefix('api/v1').middleware('auth:jwt')
-
-Route.get('getfollowings','SearchController.getUserFollowings')
-Route.get('getfollowers','SearchController.getUserFollowers')
 
 // SEARCH ROUTES
 Route.group(() => {

@@ -50,38 +50,13 @@ class PostController {
       const page = request.input("page", 1);
       const authUser = await auth.getUser();
       const authUserJson = authUser.toJSON();
-      const savePostIds = await UserSavedPost.query()
-        .where("user_id", authUserJson.id)
-        .select("post_id")
-        .fetch();
+      const savePostIds = await UserSavedPost.query().where("user_id", authUserJson.id).select("post_id").fetch();
       const postIds = R.pluck("post_id")(savePostIds.toJSON());
-      const posts = await PostMaster.query()
-        .active()
-        .whereIn("id", postIds)
-        .with("postDetail", builder =>
-          builder.select("post_id", "post_detail_title", "image_url")
-        )
-        .with("comments.user", builder =>
-          builder.select(
-            "id",
-            "first_name",
-            "last_name",
-            "email",
-            "profile_pic_url"
-          )
-        )
-        .with("users", builder =>
-          builder.select(
-            "id",
-            "first_name",
-            "last_name",
-            "email",
-            "profile_pic_url"
-          )
-        )
-        .with("userFollowing", builder =>
-          builder.where("follower_id", authUserJson.id)
-        )
+      const posts = await PostMaster.query().active().whereIn("id", postIds)
+        .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
+        .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
+        .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
+        .with("userFollowing", builder => builder.where("follower_id", authUserJson.id))
         .with("userSavedPost.post", builder => builder.select("id"))
         .with("userWiseLike.user", builder => builder.select("id"))
         .with("postCategory")
@@ -104,7 +79,6 @@ class PostController {
       if (!body.post_id) {
         return response.status(722).json({ message: "Post_id is required" });
       }
-
       const authUser = await auth.getUser();
       const authUserJson = authUser.toJSON();
       const userSavePost = new UserSavedPost();
@@ -126,71 +100,33 @@ class PostController {
     const authUser = await auth.getUser();
     const authUserJson = authUser.toJSON();
     try {
-      const userSavePost = await UserSavedPost.query()
-        .where("user_id", authUserJson.id)
-        .where("post_id", body.post_id)
-        .delete();
-      return response
-        .status(200)
-        .json({ message: "Post Unsaved Successfully" });
+      const userSavePost = await UserSavedPost.query().where("user_id", authUserJson.id).where("post_id", body.post_id).delete();
+      return response.status(200).json({ message: "Post Unsaved Successfully" });
     } catch (e) {
       console.log(e);
       return response.status(400).json({ message: "Something went wrong" });
     }
   }
 
-  async userSharePost({ request, auth, response }) {
-    try {
-      const body = request.get();
-      if (!body.post_id) {
-        return response.status(722).json({ message: "Post_id is required" });
-      }
-      const authUser = await auth.getUser();
-      const authUserJson = authUser.toJSON();
-      const userSavePost = new UserSharePost();
-      userSavePost.post_id = body.post_id;
-      // userSavePost.user_id = body.user_id
-      userSavePost.user_id = authUserJson.id;
-      await userSavePost.save();
-      return response.status(200).json({ message: "Post Shared Successfully" });
-    } catch (e) {
-      Logger.info({ url: request.url(), exception: e.message });
-      return response.status(400).json({ message: e.message });
-    }
-  }
-
   async reportPost({ request, auth, response }) {
     try {
-      const body = request.post();
-      const user_id = auth.user.id;
-      const post_id = body.post_id;
-
-      const reportLimit = 3;
-      //check if current report exist from same user
-      const existingreport = await Database.from("post_reports").where({user_id, post_id});
-      const reportexist = existingreport.length === 0 ? false : true;
-      if (!reportexist) {
-        //check num of counts on that posts
-        const reportsOnThatPost = await Database.from("post_reports").where({
-          post_id
-        });
-        if (reportsOnThatPost.length < reportLimit) {
-          const Report = new PostReport();
-          Report.user_id = user_id;
-          Report.post_id = post_id;
-          Report.reason = body.reason
-          Report.description = body.description
-          await Report.save();
-          if (reportsOnThatPost.length === reportLimit - 1) {
-            await PostMaster.query().where("id", post_id).update({ active: 0 });
-          }
-          return response.status(200).json({ message: "Post Reported Successfully" });
-        }
-        return response.status(400).json({ message: "post limit reached maximum,under review" });
-      } else {
-        return response.status(400).json({ message: "Post already reported" });
+      const body = request.post()
+      const user = await auth.getUser()
+      const userJson = user.toJSON() 
+      const reportCount = await PostReport.query().where('post_id', body.post_id).getCount()
+      if(R.equals(reportCount, 3)) {
+        return response.status(200).json({ message: 'Post has been deactivated' });
       }
+      if(R.equals(reportCount, 2)) {
+        await PostMaster.query().where('id', body.post_id).update({ active: 0 })
+      }
+      const rpt = new PostReport()
+      rpt.post_id = body.post_id
+      rpt.user_id = userJson.id
+      await rpt.save()
+      return response.status(200).json({ message: 'Post Reported Successfully' });
     } catch (e) {
+      console.log(e)
       Logger.info({ url: request.url(), exception: e.message });
       return response.status(400).json({ message: e.message });
     }

@@ -2,6 +2,7 @@ const Config = use('Config')
 const AWS = require('aws-sdk')
 const fs = require('fs')
 const tinify = require("tinify");
+const Env = use("Env");
 tinify.key = Env.get("TINY_PNG_API_KEY");
 const UserOtp = use('App/Models/UserOtp')
 const R = require('ramda')
