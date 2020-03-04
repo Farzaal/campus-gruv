@@ -125,16 +125,25 @@ class UserController {
     return response.status(200).json(savedUserJson)
   }
 
-  async getUserById({ request, response }) {
+  async getUserById({ request, auth, response }) {
+    const authUser = await auth.getUser()
+    const authUserJson = authUser.toJSON()
     const body = request.get()
     if (!body.user_id) {
       return response.status(722).json({ message: 'user_id is required' })
     }
-    const user = await User.query().where('id', body.user_id).with('campus').first()
+    const user = await User.query().where('id', body.user_id)
+      .with('campus')
+      .with('userFollowing').first()
     if (!user) {
       return response.status(200).json({ message: 'User does not exist' })
     }
     const userJson = user.toJSON()
+    const { userFollowing } = userJson
+    const followStatus = userFollowing.find((follower) => follower.follower_id == 491)
+    let isFollowing = R.isNil(followStatus) ? false : true
+    delete userJson['userFollowing']
+    userJson.isFollowing = isFollowing 
     return response.status(200).json(userJson)
   }
 
