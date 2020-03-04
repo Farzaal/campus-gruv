@@ -140,7 +140,7 @@ class UserController {
     }
     const userJson = user.toJSON()
     const { userFollowing } = userJson
-    const followStatus = userFollowing.find((follower) => follower.follower_id == 491)
+    const followStatus = userFollowing.find((follower) => follower.follower_id == authUserJson.id)
     let isFollowing = R.isNil(followStatus) ? false : true
     delete userJson['userFollowing']
     userJson.isFollowing = isFollowing 

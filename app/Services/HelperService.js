@@ -72,6 +72,22 @@ class HelperService {
             return ''
         }
     }
+
+    static getFollowerStatus(posts, id) {
+        let postFolStatus = []
+        posts.map((post) => {
+            const { userFollowing } = post
+            let isFollowing = false;
+            if (!R.isEmpty(userFollowing)) {
+                const status = userFollowing.find((follower) => follower.follower_id == id)
+                isFollowing = R.isNil(status) ? false : true
+            }
+            delete post['userFollowing']
+            post.isFollowing = isFollowing
+            postFolStatus.push(post)
+        })
+        return postFolStatus
+    }
 }
 
 module.exports = HelperService

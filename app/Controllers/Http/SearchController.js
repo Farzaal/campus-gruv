@@ -4,6 +4,7 @@ const PostMaster = use("App/Models/PostMaster");
 const User = use("App/Models/User");
 const Campus = use("App/Models/Campus");
 const UserFollower = use("App/Models/UserFollower");
+const HelperService = use("App/Services/HelperService");
 const Logger = use("Logger");
 const Database = use("Database");
 
@@ -29,6 +30,7 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
+      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
       return response.status(200).json(postsJson);
     }
 
