@@ -109,7 +109,8 @@ class UserController {
     const user = await User.find(id)
     if (request.file('profile_pic')) {
       const prof = request.file('profile_pic')
-      user.profile_pic_url = await HelperService.uploadToS3(prof)
+      const { Location } = await HelperService.uploadToS3(prof)
+      user.profile_pic_url = Location
     }
     user.campus_id = campus_id
     dob ? user.dob = new Date(dob) : ''
