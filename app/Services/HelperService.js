@@ -28,11 +28,10 @@ class HelperService {
         }
     }
 
-    static uploadToS3(prof, bucketName = null) {
+    static uploadToS3(prof, folder, bucketName = null) {    
         const bucket = bucketName ? bucketName : Config.get('aws.bucketName')
-        const params = this.s3Params(prof, bucket);
+        const params = this.s3Params(prof, folder, bucket);
         const s3 = new AWS.S3({ accessKeyId: Config.get('aws.accessKeyId'), secretAccessKey: Config.get('aws.secretAccessKey') })
-        console.log("About to upload to s3");
         return new Promise((accept, reject) => {
             s3.upload(params, function (err, data) {
                 if (err) {
@@ -44,10 +43,10 @@ class HelperService {
         })
     }
 
-    static s3Params(prof, bucket) {
+    static s3Params(prof, folder, bucket) {
         return {
             Bucket: bucket,
-            Key: prof.clientName,
+            Key: `${folder}/${prof.clientName}`,
             Body: fs.createReadStream(prof.tmpPath),
             ACL: 'public-read'
         };

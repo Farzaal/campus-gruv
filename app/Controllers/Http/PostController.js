@@ -28,10 +28,12 @@ class PostController {
 
   async postDetail({ request, auth, response }) {
     const body = request.post();
+    const authUsr = await auth.getUser()
+    const { uuid } = authUsr.toJSON()
     const postDetailImages = request.file("post_detail_images");
     let message = "Unable to save post detail";
     try {
-      const { Location } = await HelperService.uploadToS3(postDetailImages, Config.get('aws.postbucketName'))
+      const { Location } = await HelperService.uploadToS3(postDetailImages, uuid, Config.get('aws.postbucketName'))
       const postDetail = new PostDetail();
       postDetail.post_id = body.post_id;
       postDetail.user_id = body.user_id;

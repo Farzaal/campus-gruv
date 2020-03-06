@@ -8,7 +8,7 @@ class User extends Model {
     this.addHook('beforeCreate', 'UserHook.hashPassword')
   }
   static get hidden () {
-    return ['password', 'token', 'is_active', 'uuid']
+    return ['password', 'token', 'is_active']
   }
   static async getUserbyEmail(email, token) {                             
     const userByEmail = await this.query().where('email', email).with('campus').fetch()

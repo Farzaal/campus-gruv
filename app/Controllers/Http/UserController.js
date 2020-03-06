@@ -15,7 +15,8 @@ class UserController {
 
   async signUp({ request, response }) {
     const body = request.post()
-    let emailOtp = '', message = 'Signup success', type = ['email', 'reset_password'], fileUrl = ''
+    const uuid = uuidv4()
+    let emailOtp = '', message = 'Signup success', fileUrl = ''
     const userExists = await User.findBy('email', body.email)
     if (userExists) {
       return response.status(722).send({ message: 'Mail already exist' })
@@ -24,14 +25,14 @@ class UserController {
       const user = new User()
       if (request.file('profile_pic')) {
         const prof = request.file('profile_pic')
-        fileUrl = await HelperService.uploadToS3(prof)
+        fileUrl = await HelperService.uploadToS3(prof, uuid)
       }
       user.first_name = body.first_name
       user.last_name = body.last_name
       user.email = body.email
       user.password = body.password
       user.profile_pic_url = fileUrl.Location
-      user.uuid = uuidv4()
+      user.uuid = uuid
       await user.save()
       const emailOtp = await HelperService.saveUserOtp(body.email)
       HelperService.sendEmail(body.email, "SignUp Success", "email", emailOtp)
@@ -105,11 +106,11 @@ class UserController {
     const contact_no = request.input('contact_no', '')
     const graduate_year = request.input('graduate_year', '')
     const authUser = await auth.getUser()
-    const { id } = authUser.toJSON()
+    const { id, uuid } = authUser.toJSON()
     const user = await User.find(id)
     if (request.file('profile_pic')) {
       const prof = request.file('profile_pic')
-      const { Location } = await HelperService.uploadToS3(prof)
+      const { Location } = await HelperService.uploadToS3(prof, uuid)
       user.profile_pic_url = Location
     }
     user.campus_id = campus_id
