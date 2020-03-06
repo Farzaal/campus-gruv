@@ -4,7 +4,7 @@ class EditProfile {
   get rules () {
     return {
       campus_id: 'required',
-      profile_pic: 'file_ext:png,jpg|file_size:4mb|file_types:image'
+      profile_pic: 'file_ext:png,jpg,jpeg|file_size:4mb|file_types:image'
     }
   }
 
