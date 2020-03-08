@@ -74,6 +74,9 @@ class HelperService {
 
     static getFollowerStatus(posts, id) {
         let postFolStatus = []
+        if(R.isEmpty(posts)) {
+            return postFolStatus
+        }
         posts.map((post) => {
             const { userFollowing } = post
             let isFollowing = false;

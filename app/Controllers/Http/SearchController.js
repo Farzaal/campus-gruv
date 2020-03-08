@@ -30,8 +30,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      return response.status(200).json(postCol);
     }
 
     if (R.equals(type, "post_category") && body.category_id) {
@@ -50,7 +50,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "post_search") && body.description) {
       const posts = await PostMaster.query()
@@ -68,7 +69,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      return response.status(200).json(postCol);
     }
     return response.status(400).json({ message: "Invalid Type or missing required param" });
   }
@@ -90,7 +92,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "post") && body.description && body.user_id) {
       const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
@@ -106,7 +109,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "user") && body.description) {
       const users = await User.query()
@@ -117,11 +121,10 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const usersJson = users.toJSON();
-      return response.status(200).json(usersJson);
+      const postCol = HelperService.getFollowerStatus(usersJson.data, id)
+      return response.status(200).json(postCol);
     }
-    return response
-      .status(400)
-      .json({ message: "Invalid Type or missing required param" });
+    return response.status(400).json({ message: "Invalid Type or missing required param" });
   }
 
   async searchCampus({ request, response }) {
@@ -130,9 +133,7 @@ class SearchController {
       return response.status(722).json({ message: "Description is required" });
     }
     const { page, description } = body;
-    const campuses = await Campus.query()
-      .where("description", "LIKE", `%${description}%`)
-      .paginate(page);
+    const campuses = await Campus.query().where("description", "LIKE", `%${description}%`).paginate(page);
     const campusJson = campuses.toJSON();
     return response.status(200).json(campusJson);
   }
@@ -154,6 +155,7 @@ class SearchController {
           .with('campuses', (builder) => builder.select('id', 'description'))
           .orderBy('created_at', 'DESC').paginate(page)
       const followerPostsJson = followerPosts.toJSON()
+      // const postCol = HelperService.getFollowerStatus(followerPostsJson.data, authUserJson.id)
       return response.status(200).json(followerPostsJson)
     } catch (e) {
       Logger.info({ url: request.url(), Exception: e.message });
