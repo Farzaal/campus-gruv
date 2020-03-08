@@ -4,10 +4,12 @@ const uuidv4 = require('uuid/v4');
 const Logger = use('Logger')
 const Hash = use('Hash')
 const R = use('ramda')
+const Config = use('Config')
 const UserSavedPost = use('App/Models/UserSavedPost')
 const ApiService = use('App/Services/ApiService')
 const HelperService = use('App/Services/HelperService')
 const UserFollower = use('App/Models/UserFollower')
+const UserPostAction = use('App/Models/UserPostAction')
 const UserWiseNotification = use('App/Models/UserWiseNotification')
 const UserOtp = use('App/Models/UserOtp')
 
@@ -224,6 +226,21 @@ class UserController {
       Logger.info({ url: request.url(), Exception: e.message })
       return response.status(200).json({ message: 'Something Went Wrong' })
     }
+  }
+
+  async userAction({ request, auth, response }) {
+    const body = request.post()
+    const actions = Config.get('constants.USER_ACTIONS')
+    if(R.isNil(body.action) || R.isNil(body.apply_to)) {
+      return response.status(722).json({ message: "action mute,block || apply_to is required" })
+    }
+    if(R.equals(body.action, actions.mute) || R.equals(body.action, actions.block)) {
+      const authUser = await auth.getUser()
+      const authUserJson = authUser.toJSON()
+      UserPostAction.create({ user_id: authUserJson.id, user_action: body.action, apply_to: body.apply_to })
+      return response.status(200).json({ message: 'User action saved successfully' })
+    }
+    return response.status(400).json({ message: 'Invalid action' })
   }
 }
 

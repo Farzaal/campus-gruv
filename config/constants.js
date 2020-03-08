@@ -2,6 +2,6 @@ const Env = use('Env');
 
 module.exports = {
     admin_email: 'campus.gruv.2020@gmail.com',
-    SEND_USER_NOTIFICATION: Env.get('SEND_USER_NOTIFICATION') 
-
+    SEND_USER_NOTIFICATION: Env.get('SEND_USER_NOTIFICATION'), 
+    USER_ACTIONS: {  mute:"mute", block:"block" }
 }

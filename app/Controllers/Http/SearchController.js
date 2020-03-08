@@ -4,6 +4,7 @@ const PostMaster = use("App/Models/PostMaster");
 const User = use("App/Models/User");
 const Campus = use("App/Models/Campus");
 const UserFollower = use("App/Models/UserFollower");
+const UserPostAction = use("App/Models/UserPostAction");
 const HelperService = use("App/Services/HelperService");
 const Logger = use("Logger");
 const Database = use("Database");
@@ -14,11 +15,12 @@ class SearchController {
     const { type, page } = body;
     const { id } = await this.getFromAuthUser(auth);
     const campus_id = body.campus_id ? body.campus_id : auth.user.campus_id
-
+    const actions = await HelperService.userPostActions(id)
     if (R.equals(type, "post_all")) {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
+        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -39,6 +41,7 @@ class SearchController {
         .active()
         .where("campus_id", campus_id)
         .where("category_id", body.category_id)
+        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -57,6 +60,7 @@ class SearchController {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
+        .whereNotIn("user_id", actions)
         .where("title", "LIKE", `%${body.description}%`)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -79,8 +83,9 @@ class SearchController {
     const body = request.get();
     const { type, page } = body;
     const { campus_id, id } = await this.getFromAuthUser(auth);
+    const actions = HelperService.userPostActions(id)
     if (R.equals(type, "post") && body.user_id && !body.description) {
-      const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
+        const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id).whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -96,7 +101,7 @@ class SearchController {
       return response.status(200).json(postCol);
     }
     if (R.equals(type, "post") && body.description && body.user_id) {
-      const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
+      const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id).whereNotIn("user_id", actions)
         .where("title", "LIKE", `%${body.description}%`)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -116,6 +121,7 @@ class SearchController {
       const users = await User.query()
         .where("campus_id", campus_id)
         .where("first_name", "LIKE", `%${body.description}%`)
+        .whereNotIn("user_id", actions)
         .with("campus")
         .with("userFollowing", builder => builder.where("follower_id", id))
         .orderBy("created_at", "DESC")
@@ -133,7 +139,7 @@ class SearchController {
       return response.status(722).json({ message: "Description is required" });
     }
     const { page, description } = body;
-    const campuses = await Campus.query().where("description", "LIKE", `%${description}%`).paginate(page);
+    const campuses = await Campus.query().active().where("description", "LIKE", `%${description}%`).paginate(page);
     const campusJson = campuses.toJSON();
     return response.status(200).json(campusJson);
   }
@@ -144,7 +150,9 @@ class SearchController {
       const authUserJson = await this.getFromAuthUser(auth)
       const followers = await UserFollower.query().where('user_id', authUserJson.id).select('follower_id').fetch()
       const followerIds = R.pluck('follower_id')(followers.toJSON())
-      const followerPosts = await PostMaster.query().active().whereIn('user_id', followerIds)
+      const postAction = HelperService.userPostActions(authUserJson.id)
+      const ids = R.symmetricDifference(followerIds, postAction)
+        const followerPosts = await PostMaster.query().active().whereIn('user_id', ids)
           .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
           .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
           .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
@@ -155,7 +163,6 @@ class SearchController {
           .with('campuses', (builder) => builder.select('id', 'description'))
           .orderBy('created_at', 'DESC').paginate(page)
       const followerPostsJson = followerPosts.toJSON()
-      // const postCol = HelperService.getFollowerStatus(followerPostsJson.data, authUserJson.id)
       return response.status(200).json(followerPostsJson)
     } catch (e) {
       Logger.info({ url: request.url(), Exception: e.message });
@@ -199,31 +206,25 @@ class SearchController {
   }
 
   async getUserFollowers({ request, response, auth }) {
-    const { user_id  } = request.get();
+    const { user_id } = request.get();
     const { campus_id, id } = await this.getFromAuthUser(auth);
     const page = request.input('page', 1)
-    
     try {
-      const follower = await UserFollower.query()
-        .where("user_id", user_id)
-        .select("follower_id")
-        .fetch();
-
+      const follower = await UserFollower.query().where("user_id", id).select("follower_id").fetch();
       const followerIds = R.pluck("follower_id")(follower.toJSON());
-
-      const followers = await User.query()
-        .where("campus_id", campus_id)
-        .whereIn("id", followerIds)
+      const postAction = await HelperService.userPostActions(id)
+      const userId = R.symmetricDifference(followerIds, postAction)
+      const followers = await User.query().where("campus_id", campus_id)
+        .whereIn("id", userId)
         .with("userFollower", builder => builder.where("follower_id", id))
         .orderBy("created_at", "DESC")
         .paginate(page);
       const followerusersJson = followers.toJSON();
       return response.status(200).json(followerusersJson);
     } catch (e) {
+      console.log(e)
       Logger.info({ url: request.url(), Exception: e.message });
-      return response.status(400).json({
-        message: "Something went wrong. Unable to get followers"
-      });
+      return response.status(400).json({ message: "Something went wrong. Unable to get followers" });
     }
   }
 }

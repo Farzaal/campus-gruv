@@ -5,6 +5,7 @@ const tinify = require("tinify");
 const Env = use("Env");
 tinify.key = Env.get("TINY_PNG_API_KEY");
 const UserOtp = use('App/Models/UserOtp')
+const UserPostAction = use('App/Models/UserPostAction')
 const R = require('ramda')
 
 class HelperService {
@@ -89,6 +90,16 @@ class HelperService {
             postFolStatus.push(post)
         })
         return postFolStatus
+    }
+
+    static async userPostActions(id) {
+        let actions = []
+        const userAction = await UserPostAction.query().where('user_id', id).fetch()
+        if(R.isEmpty(userAction.toJSON())) {
+            return actions
+        }
+        actions = R.pluck("apply_to")(userAction.toJSON());
+        return actions
     }
 }
 

@@ -54,7 +54,6 @@ class PostController {
       const authUserJson = authUser.toJSON();
       const savePostIds = await UserSavedPost.query().where("user_id", authUserJson.id).select("post_id").fetch();
       const postIds = R.pluck("post_id")(savePostIds.toJSON());
-      console.log(authUserJson, postIds)
       const posts = await PostMaster.query().active().whereIn("id", postIds)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
