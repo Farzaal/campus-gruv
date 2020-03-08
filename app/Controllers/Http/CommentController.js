@@ -22,7 +22,8 @@ class CommentController {
       const saveComment = await UserWiseComment.create(comment)
       const saveNotification = await UserWiseNotification.create(user_notification)
       const saveCommentJson = saveComment.toJSON()
-      const sendNotification = await ApiService.sendUserNotification({ user_id: body.post_created_by, notification: commentMsg });
+      const data = { post_id: body.post_id ,user_id: body.post_created_by, notification: commentMsg }
+      const sendNotification = await ApiService.sendUserNotification(data);
       return response.status(200).json(saveCommentJson)
     } catch (exp) {
       console.log(exp)
