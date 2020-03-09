@@ -20,7 +20,6 @@ class SearchController {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
-        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -42,7 +41,6 @@ class SearchController {
         .active()
         .where("campus_id", campus_id)
         .where("category_id", body.category_id)
-        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -62,7 +60,6 @@ class SearchController {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
-        .whereNotIn("user_id", actions)
         .where("title", "LIKE", `%${body.description}%`)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -88,7 +85,7 @@ class SearchController {
     const { campus_id, id } = await this.getFromAuthUser(auth);
     const actions = HelperService.userPostActions(id)
     if (R.equals(type, "post") && body.user_id && !body.description) {
-        const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id).whereNotIn("user_id", actions)
+        const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -105,7 +102,7 @@ class SearchController {
       return response.status(200).json(postCol);
     }
     if (R.equals(type, "post") && body.description && body.user_id) {
-      const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id).whereNotIn("user_id", actions)
+      const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
         .where("title", "LIKE", `%${body.description}%`)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -126,7 +123,6 @@ class SearchController {
       const users = await User.query()
         .where("campus_id", campus_id)
         .where("first_name", "LIKE", `%${body.description}%`)
-        .whereNotIn("user_id", actions)
         .with("campus")
         .with("userFollowing", builder => builder.where("follower_id", id))
         .orderBy("created_at", "DESC")
