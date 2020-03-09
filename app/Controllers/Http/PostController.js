@@ -67,6 +67,7 @@ class PostController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postFollow = HelperService.getFollowerStatus(postsJson.data, authUserJson.id)
+      postsJson.data = postFollow 
       return response.status(200).json(postFollow);
     } catch (e) {
       Logger.info({ url: request.url(), Exception: e.message });

@@ -33,7 +33,8 @@ class SearchController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      return response.status(200).json(postCol);
+      postsJson.data = postCol 
+      return response.status(200).json(postsJson);
     }
 
     if (R.equals(type, "post_category") && body.category_id) {
@@ -54,6 +55,7 @@ class SearchController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      postsJson.data = postCol 
       return response.status(200).json(postCol);
     }
     if (R.equals(type, "post_search") && body.description) {
@@ -74,6 +76,7 @@ class SearchController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      postsJson.data = postCol 
       return response.status(200).json(postCol);
     }
     return response.status(400).json({ message: "Invalid Type or missing required param" });
@@ -98,6 +101,7 @@ class SearchController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      postsJson.data = postCol 
       return response.status(200).json(postCol);
     }
     if (R.equals(type, "post") && body.description && body.user_id) {
@@ -115,6 +119,7 @@ class SearchController {
         .paginate(page);
       const postsJson = posts.toJSON();
       const postCol = HelperService.getFollowerStatus(postsJson.data, id)
+      postsJson.data = postCol 
       return response.status(200).json(postCol);
     }
     if (R.equals(type, "user") && body.description) {
@@ -128,6 +133,7 @@ class SearchController {
         .paginate(page);
       const usersJson = users.toJSON();
       const postCol = HelperService.getFollowerStatus(usersJson.data, id)
+      postsJson.data = postCol 
       return response.status(200).json(postCol);
     }
     return response.status(400).json({ message: "Invalid Type or missing required param" });
