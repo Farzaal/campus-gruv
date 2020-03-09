@@ -66,9 +66,9 @@ class PostController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      const postFollow = HelperService.getFollowerStatus(postsJson.data, authUserJson.id)
-      postsJson.data = postFollow 
-      return response.status(200).json(postFollow);
+      // const postFollow = HelperService.getFollowerStatus(postsJson.data, authUserJson.id)
+      // postsJson.data = postFollow 
+      return response.status(200).json(postsJson);
     } catch (e) {
       Logger.info({ url: request.url(), Exception: e.message });
       return response
