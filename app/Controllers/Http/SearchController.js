@@ -20,6 +20,7 @@ class SearchController {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
+        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -31,9 +32,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson, id)
+      return response.status(200).json(postCol);
     }
 
     if (R.equals(type, "post_category") && body.category_id) {
@@ -41,6 +41,7 @@ class SearchController {
         .active()
         .where("campus_id", campus_id)
         .where("category_id", body.category_id)
+        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -52,15 +53,15 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "post_search") && body.description) {
       const posts = await PostMaster.query()
         .active()
         .where("campus_id", campus_id)
         .where("title", "LIKE", `%${body.description}%`)
+        .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -72,9 +73,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson, id)
+      return response.status(200).json(postCol);
     }
     return response.status(400).json({ message: "Invalid Type or missing required param" });
   }
@@ -97,9 +97,8 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "post") && body.description && body.user_id) {
       const posts = await PostMaster.query().active().where("campus_id", campus_id).where("user_id", body.user_id)
@@ -115,22 +114,22 @@ class SearchController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      // const postCol = HelperService.getFollowerStatus(postsJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(postsJson);
+      const postCol = HelperService.getFollowerStatus(postsJson, id)
+      return response.status(200).json(postCol);
     }
     if (R.equals(type, "user") && body.description) {
+      const actions = await HelperService.userPostActions(id)
       const users = await User.query()
         .where("campus_id", campus_id)
         .where("first_name", "LIKE", `%${body.description}%`)
+        .whereNotIn("id", actions)
         .with("campus")
         .with("userFollowing", builder => builder.where("follower_id", id))
         .orderBy("created_at", "DESC")
         .paginate(page);
       const usersJson = users.toJSON();
-      // const postCol = HelperService.getFollowerStatus(usersJson.data, id)
-      // postsJson.data = postCol 
-      return response.status(200).json(usersJson);
+      const postCol = HelperService.getFollowerStatus(usersJson, id)
+      return response.status(200).json(postCol);
     }
     return response.status(400).json({ message: "Invalid Type or missing required param" });
   }

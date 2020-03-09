@@ -73,12 +73,13 @@ class HelperService {
         }
     }
 
-    static getFollowerStatus(posts, id) {
+    static getFollowerStatus(apiRes, id) {
+        const { data } = apiRes
         let postFolStatus = []
-        if(R.isEmpty(posts)) {
-            return postFolStatus
+        if(R.isEmpty(data)) {
+            return apiRes
         }
-        posts.map((post) => {
+        data.map((post) => {
             const { userFollowing } = post
             let isFollowing = false;
             if (!R.isEmpty(userFollowing)) {
@@ -89,7 +90,8 @@ class HelperService {
             post.isFollowing = isFollowing
             postFolStatus.push(post)
         })
-        return postFolStatus
+        apiRes.data = postFolStatus;
+        return apiRes
     }
 
     static async userPostActions(id) {
