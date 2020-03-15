@@ -47,8 +47,6 @@ class LikeController {
             await trx.insert({ post_id: body.post_id, user_id: body.post_created_by, notification_message: likeMsg,
                     created_at: new Date(), updated_at: new Date() }).into('user_wise_notifications')
                     await trx.commit()
-            const data = { post_id: body.post_id, user_id: body.post_created_by, notification: likeMsg }
-            const sendNotification = await ApiService.sendUserNotification(data);
             return response.status(201).json({ message: 'Post disliked successfully' })
         } catch(e) {
             console.log(e)
