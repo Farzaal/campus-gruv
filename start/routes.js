@@ -60,7 +60,7 @@ Route.group(() => {
 // PROFILE ROUTES
 Route.group(() => {
   Route.patch('edit/profile', 'UserController.editUserProfile').validator('EditProfile')
-  Route.post('user/action', 'UserController.userAction')
+  Route.post('user/action', 'UserController.userAction').validator('PostAction')
   Route.get('get/user', 'UserController.getUserById')
   Route.get('user/notifications', 'UserController.userNotifications')
   Route.get('user/follow', 'UserController.followUser')

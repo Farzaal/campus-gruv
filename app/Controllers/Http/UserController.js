@@ -232,18 +232,25 @@ class UserController {
   }
 
   async userAction({ request, auth, response }) {
-    const body = request.post()
-    const actions = Config.get('constants.USER_ACTIONS')
-    if(R.isNil(body.action) || R.isNil(body.apply_to)) {
-      return response.status(722).json({ message: "action mute,block || apply_to is required" })
-    }
-    if(R.equals(body.action, actions.mute) || R.equals(body.action, actions.block)) {
+    try {
+      let message = 'User action saved successfully'
+      const body = request.post()
+      const { action, apply_action, apply_to } = body
       const authUser = await auth.getUser()
       const authUserJson = authUser.toJSON()
-      UserPostAction.create({ user_id: authUserJson.id, user_action: body.action, apply_to: body.apply_to })
-      return response.status(200).json({ message: 'User action saved successfully' })
+      if(R.equals(apply_action, 1)) {
+        const act = new UserPostAction()
+        await UserPostAction.create({ user_id: authUserJson.id, user_action: action, apply_to: apply_to })
+      } else {
+        const action = await UserService.checkUserAction(authUserJson.id, body.apply_to, 'action')
+        console.log(action)
+        !R.isEmpty(action) ? await UserPostAction.query().where('id', action[0].id).delete() : ''
+      }
+      return response.status(200).json({ message })
+    } catch(e) {
+      console.log(e)
+      return response.status(200).json({ message: 'Something went wrong' })
     }
-    return response.status(400).json({ message: 'Invalid action' })
   }
 }
 
