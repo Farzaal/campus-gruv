@@ -1,9 +1,8 @@
 'use strict'
 const Logger = use('Logger')
-const PostMaster = use('App/Models/PostMaster')
-const UserWiseLike = use('App/Models/UserWiseLike')
 const ApiService = use('App/Services/ApiService')
 const Database = use('Database')
+const UserService = use('App/Services/UserService')
 
 class LikeController {
 
@@ -11,23 +10,26 @@ class LikeController {
         const body = request.post()
         const user = await auth.getUser()
         const userJson = user.toJSON()
-        const likeMsg = `${userJson.first_name} ${userJson.last_name} has liked your post` 
+        const likeMsg = `${userJson.first_name} ${userJson.last_name} has liked your post`
+        const sendNotification = await UserService.checkUserAction(body.post_created_by, body.user_id)
         const trx = await Database.beginTransaction()
         try {
             await trx.table('post_master').where('id', body.post_id).increment('likes_count', 1)
-            
-            await trx.insert({ post_id: body.post_id, user_id: body.user_id,
-            created_at: new Date(), updated_at: new Date() }).into('user_wise_likes')
-            
-            await trx.insert({ post_id: body.post_id, user_id: body.post_created_by, notification_by: body.user_id ,notification_message: likeMsg,
-            created_at: new Date(), updated_at: new Date() }).into('user_wise_notifications')
-            await trx.commit()
-            const data = { post_id: body.post_id, user_id: body.post_created_by, notification: likeMsg }
-            const sendNotification = await ApiService.sendUserNotification(data);
+
+            await trx.insert({ post_id: body.post_id, user_id: body.user_id, created_at: new Date(), updated_at: new Date()}).into('user_wise_likes')
+            if(sendNotification) {
+                await trx.insert({
+                    post_id: body.post_id, user_id: body.post_created_by, notification_by: body.user_id, notification_message: likeMsg,
+                    created_at: new Date(), updated_at: new Date()
+                }).into('user_wise_notifications')
+                await trx.commit()
+                const data = { post_id: body.post_id, user_id: body.post_created_by, notification: likeMsg }
+                const sendNotification = await ApiService.sendUserNotification(data);
+            }
             return response.status(201).json({ message: 'Post liked successfully' })
-        } catch(e) {
-            Logger.info({ url: request.url(), Exception: e.message})
-            await trx.rollback() 
+        } catch (e) {
+            Logger.info({ url: request.url(), Exception: e.message })
+            await trx.rollback()
             console.log(e);
             return response.status(400).json({ message: 'Unable to like post' })
         }
