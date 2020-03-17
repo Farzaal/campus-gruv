@@ -44,8 +44,6 @@ class LikeController {
             await trx.table('user_wise_likes')
                     .where('post_id', body.post_id)
                     .where('user_id', body.user_id).delete()
-            await trx.insert({ post_id: body.post_id, user_id: body.post_created_by, notification_message: likeMsg,
-                    created_at: new Date(), updated_at: new Date() }).into('user_wise_notifications')
                     await trx.commit()
             return response.status(201).json({ message: 'Post disliked successfully' })
         } catch(e) {
