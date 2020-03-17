@@ -55,7 +55,8 @@ module.exports = {
       port: Env.get('DB_PORT', '3306'),
       user: Env.get('DB_USER', 'root'),
       password: Env.get('DB_PASSWORD', 'root'),
-      database: Env.get('DB_DATABASE', 'campus_gruv_dev')
+      database: Env.get('DB_DATABASE', 'campus_gruv_dev'),
+      charset: Env.get('DB_CHARSET', 'utf8mb4')
     },
     debug: Env.get('DB_DEBUG', false),
     pool: { min: 1, max: 100 },
