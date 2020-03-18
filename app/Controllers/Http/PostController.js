@@ -66,9 +66,10 @@ class PostController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      const postFollow = HelperService.getFollowerStatus(postsJson.data, authUserJson.id)
+      const postFollow = HelperService.getFollowerStatus(postsJson, authUserJson.id)
       return response.status(200).json(postFollow);
     } catch (e) {
+      console.log(e);
       Logger.info({ url: request.url(), Exception: e.message });
       return response.status(400).json({ message: "Something went wrong. Unable to get saved posts" });
     }
@@ -88,6 +89,7 @@ class PostController {
       await userSavePost.save();
       return response.status(200).json({ message: "Post Saved Successfully" });
     } catch (e) {
+      console.log(e);
       Logger.info({ url: request.url(), exception: e.message });
       return response.status(400).json({ message: "Post already saved" });
     }

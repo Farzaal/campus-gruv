@@ -53,10 +53,9 @@ module.exports = {
     connection: {
       host: Env.get('DB_HOST', 'campus-gruv-dev.ccdmdkvwh98h.us-east-2.rds.amazonaws.com'),
       port: Env.get('DB_PORT', '3306'),
-      user: Env.get('DB_USER', 'admin'),
-      password: Env.get('DB_PASSWORD', 'admin12345'),
-      database: Env.get('DB_DATABASE', 'campus_gruv_dev'),
-      charset: Env.get('DB_CHARSET', 'utf8mb4')
+      user: Env.get('DB_USER', 'root'),
+      password: Env.get('DB_PASSWORD', 'root'),
+      database: Env.get('DB_DATABASE', 'campus_gruv_dev')
     },
     debug: Env.get('DB_DEBUG', false),
     pool: { min: 1, max: 100 },
