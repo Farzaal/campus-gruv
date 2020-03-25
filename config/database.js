@@ -51,11 +51,11 @@ module.exports = {
   mysql: {
     client: 'mysql',
     connection: {
-      host: Env.get('DB_HOST', 'localhost'),
+      host: Env.get('DB_HOST', '192.168.1.8'),
       port: Env.get('DB_PORT', '3306'),
       user: Env.get('DB_USER', 'root'),
       password: Env.get('DB_PASSWORD', 'root'),
-      database: Env.get('DB_DATABASE', 'campus_gruv_dev')
+      database: Env.get('DB_DATABASE', 'L6p2G1KnSJ')
     },
     debug: Env.get('DB_DEBUG', false),
     pool: { min: 1, max: 100 },
