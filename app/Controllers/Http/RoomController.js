@@ -31,7 +31,7 @@ class RoomController {
         const userJson = user.toJSON();
         const usrRooms = await RoomDetail.query().where('user_id', userJson.id).fetch();
         const roomIds = R.pluck('room_id')(usrRooms.toJSON())
-        const usrHis = await RoomDetail.query().whereNot('user_id', userJson.id).whereIn('room_id', roomIds).with('user').paginate(page)
+        const usrHis = await RoomDetail.query().whereNot('user_id', userJson.id).whereIn('room_id', roomIds).orderBy('created_at', 'desc').with('user').paginate(page)
         return response.status(200).json(usrHis.toJSON());
     }
 }
