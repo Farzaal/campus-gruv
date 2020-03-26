@@ -59,7 +59,6 @@ class SearchController {
     if (R.equals(type, "post_search") && body.description) {
       const posts = await PostMaster.query()
         .active()
-        .where("campus_id", campus_id)
         .where("title", "LIKE", `%${body.description}%`)
         .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
@@ -120,7 +119,6 @@ class SearchController {
     if (R.equals(type, "user") && body.description) {
       const actions = await HelperService.userPostActions(id)
       const users = await User.query()
-        .where("campus_id", campus_id)
         .where("first_name", "LIKE", `%${body.description}%`)
         .whereNotIn("id", actions)
         .with("campus")
