@@ -54,7 +54,7 @@ class PostController {
       const authUserJson = authUser.toJSON();
       const savePostIds = await UserSavedPost.query().where("user_id", authUserJson.id).select("post_id").fetch();
       const postIds = R.pluck("post_id")(savePostIds.toJSON());
-      const posts = await PostMaster.query().active()
+      const posts = await PostMaster.query().active().whereIn('id', postIds)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
@@ -66,9 +66,10 @@ class PostController {
         .orderBy("created_at", "DESC")
         .paginate(page);
       const postsJson = posts.toJSON();
-      const postFollow = HelperService.getFollowerStatus(postsJson.data, authUserJson.id)
+      const postFollow = HelperService.getFollowerStatus(postsJson, authUserJson.id)
       return response.status(200).json(postFollow);
     } catch (e) {
+      console.log(e);
       Logger.info({ url: request.url(), Exception: e.message });
       return response.status(400).json({ message: "Something went wrong. Unable to get saved posts" });
     }
@@ -88,6 +89,7 @@ class PostController {
       await userSavePost.save();
       return response.status(200).json({ message: "Post Saved Successfully" });
     } catch (e) {
+      console.log(e);
       Logger.info({ url: request.url(), exception: e.message });
       return response.status(400).json({ message: "Post already saved" });
     }
