@@ -59,7 +59,6 @@ class SearchController {
     if (R.equals(type, "post_search") && body.description) {
       const posts = await PostMaster.query()
         .active()
-        .where("campus_id", campus_id)
         .where("title", "LIKE", `%${body.description}%`)
         .whereNotIn("user_id", actions)
         .with("postDetail", builder => builder.select("post_id", "post_detail_title", "image_url"))
@@ -120,7 +119,6 @@ class SearchController {
     if (R.equals(type, "user") && body.description) {
       const actions = await HelperService.userPostActions(id)
       const users = await User.query()
-        .where("campus_id", campus_id)
         .where("first_name", "LIKE", `%${body.description}%`)
         .whereNotIn("id", actions)
         .with("campus")
@@ -149,11 +147,12 @@ class SearchController {
     try {
       const page = request.input('page', 1)
       const authUserJson = await this.getFromAuthUser(auth)
-      const followers = await UserFollower.query().where('user_id', authUserJson.id).select('follower_id').fetch()
-      const followerIds = R.pluck('follower_id')(followers.toJSON())
+      const campus_id = request.input('campus_id',authUserJson.campus_id)
+      const followers = await UserFollower.query().where('follower_id', authUserJson.id).select('user_id').fetch()
+      const followerIds = R.pluck('user_id')(followers.toJSON())
       const postAction = HelperService.userPostActions(authUserJson.id)
       const ids = R.symmetricDifference(followerIds, postAction)
-        const followerPosts = await PostMaster.query().active().whereIn('user_id', ids)
+        const followerPosts = await PostMaster.query().active().where("campus_id", campus_id).whereIn('user_id', ids)
           .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
           .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
           .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
