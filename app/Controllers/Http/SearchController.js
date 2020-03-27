@@ -147,11 +147,12 @@ class SearchController {
     try {
       const page = request.input('page', 1)
       const authUserJson = await this.getFromAuthUser(auth)
+      const campus_id = request.input('campus_id',authUserJson.campus_id)
       const followers = await UserFollower.query().where('follower_id', authUserJson.id).select('user_id').fetch()
       const followerIds = R.pluck('user_id')(followers.toJSON())
       const postAction = HelperService.userPostActions(authUserJson.id)
       const ids = R.symmetricDifference(followerIds, postAction)
-        const followerPosts = await PostMaster.query().active().whereIn('user_id', ids)
+        const followerPosts = await PostMaster.query().active().where("campus_id", campus_id).whereIn('user_id', ids)
           .with('postDetail', (builder) => builder.select('post_id', 'post_detail_title', 'image_url'))
           .with('comments.user', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
           .with('users', (builder) => builder.select('id', 'first_name', 'last_name', 'email', 'profile_pic_url'))
