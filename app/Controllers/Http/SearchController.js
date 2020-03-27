@@ -25,7 +25,7 @@ class SearchController {
         .with("comments.user", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("users", builder => builder.select("id","first_name","last_name","email","profile_pic_url"))
         .with("userFollowing", builder => builder.where("follower_id", id))
-        .with("userSavedPost.post", builder => builder.select("id"))
+        .with("userSavedPost", builder => builder.where("user_id", auth.user.id))
         .with("userWiseLike.user", builder => builder.select("id"))
         .with("postCategory")
         .with("campuses", builder => builder.select("id", "description"))
