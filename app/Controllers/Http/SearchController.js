@@ -192,7 +192,7 @@ class SearchController {
       const followings = await User.query()
         .where("campus_id", campus_id)
         .whereIn("id", followingIds)
-        .with("userFollowing", builder => builder.where("follower_id", id))
+        .with("userFollowing", builder => builder.where("follower_id", user_id))
         .orderBy("created_at", "DESC")
         .paginate(page);
       const followingusersJson = followings.toJSON();
@@ -216,7 +216,7 @@ class SearchController {
       const userId = R.symmetricDifference(followerIds, postAction)
       const followers = await User.query().where("campus_id", campus_id)
         .whereIn("id", userId)
-        .with("userFollower", builder => builder.where("follower_id", id))
+        .with("userFollowing", builder => builder.where("follower_id", id))
         .orderBy("created_at", "DESC")
         .paginate(page);
       const followerusersJson = followers.toJSON();

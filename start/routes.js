@@ -66,8 +66,8 @@ Route.group(() => {
   Route.get('user/follow', 'UserController.followUser')
   Route.get('user/unfollow', 'UserController.unFollowUser')
   Route.get('follow/details', 'UserController.followDetails')
-  Route.get('follower/users','SearchController.getUserFollowings')
-  Route.get('following/users','SearchController.getUserFollowers')
+  Route.get('following/users','SearchController.getUserFollowings')
+  Route.get('follower/users','SearchController.getUserFollowers')
 }).prefix('api/v1').middleware('auth:jwt')
 
 // SEARCH ROUTES
